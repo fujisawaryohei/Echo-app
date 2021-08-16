@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"github.com/fujisawaryohei/echo-app/controllers"
+	"github.com/fujisawaryohei/echo-app/web/controllers"
 	"github.com/labstack/echo"
 )
 

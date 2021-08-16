@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/fujisawaryohei/echo-app/routes"
+	"github.com/fujisawaryohei/echo-app/web/routes"
 	"github.com/labstack/echo"
 )
 
