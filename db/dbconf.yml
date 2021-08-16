@@ -1,0 +1,3 @@
+development:
+    driver: postgres
+    open: user=fujisawaryohei dbname=echoapp_development sslmode=disable
