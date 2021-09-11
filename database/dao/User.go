@@ -14,7 +14,7 @@ type User struct {
 	UpdatedAt time.Time
 }
 
-func (User) ConvertToDAO(user *dto.UserDTO) *User {
+func (User) ConvertToDAO(user *dto.User) *User {
 	return &User{
 		Name:  user.Name,
 		Email: user.Email,

@@ -25,7 +25,7 @@ func (repo *UserRepository) FindById(id string) (dao.User, error) {
 	return userDAO, nil
 }
 
-func (repo *UserRepository) SaveUser(user *dto.UserDTO) error {
+func (repo *UserRepository) SaveUser(user *dto.User) error {
 	var userDAO dao.User
 	if err := repo.dbConn.Create(userDAO.ConvertToDAO(user)).Error; err != nil {
 		return err

@@ -10,7 +10,7 @@ import (
 
 func StoreUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := new(dto.UserDTO)
+		u := new(dto.User)
 		if err := c.Bind(u); err != nil {
 			return err
 		}

@@ -15,7 +15,7 @@ func NewUserUsecase(repo repositories.UserRepository) *UserUseCase {
 	}
 }
 
-func (u *UserUseCase) StoreUser(user *dto.UserDTO) error {
+func (u *UserUseCase) StoreUser(user *dto.User) error {
 	if err := u.userRepository.SaveUser(user); err != nil {
 		return err
 	}
