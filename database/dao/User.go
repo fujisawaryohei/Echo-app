@@ -7,11 +7,11 @@ import (
 )
 
 type User struct {
-	ID         int `gorm:"primaryKey"`
-	Name       string
-	Email      string
-	Created_at time.Time
-	Updated_at time.Time
+	ID        int `gorm:"primaryKey"`
+	Name      string
+	Email     string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func (User) ConvertToDAO(user *dto.UserDTO) *User {
