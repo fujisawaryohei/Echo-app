@@ -15,6 +15,7 @@ func NewServer(userUseCase *usecases.UserUseCase) {
 
 	// routing
 	e.GET("/", handlers.Index)
+	e.GET("/users/:id", handlers.Find(userUseCase))
 	e.POST("/users", handlers.StoreUser(userUseCase))
 
 	// サーバー起動
