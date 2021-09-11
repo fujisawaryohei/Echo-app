@@ -7,7 +7,7 @@ import (
 
 func NewConnection() (*gorm.DB, error) {
 	db, err := gorm.Open(postgres.New(postgres.Config{
-		DSN:                  "host=localhost user=postgres dbname=echoapp_development port=5432 sslmode=disable",
+		DSN:                  "host=localhost user=postgres dbname=blog_server port=5432 sslmode=disable",
 		PreferSimpleProtocol: true,
 	}), &gorm.Config{})
 
