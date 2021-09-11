@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/fujisawaryohei/echo-app/database"
+	"github.com/fujisawaryohei/echo-app/database/seeds"
 	"github.com/fujisawaryohei/echo-app/usecases"
 	"github.com/fujisawaryohei/echo-app/web"
 	"github.com/fujisawaryohei/echo-app/web/gateways"
@@ -17,16 +18,21 @@ func main() {
 	// アクセスロガー
 	e.Use(middleware.Logger())
 
-	// init
+	// DB Init
 	db, err := database.NewConnection()
 	if err != nil {
 		fmt.Printf("got err, %+v\n", err)
 	}
 
-	userRepository := gateways.NewUserRepository(db)
-	userUseCase := usecases.NewUserUsecase(userRepository)
+	// Seed Command Handler
+	commandArgs := seeds.SeedHandler(db)
 
-	// サーバー起動
-	web.NewServer(userUseCase)
+	// App Init
+	if len(commandArgs) == 0 {
+		userRepository := gateways.NewUserRepository(db)
+		userUseCase := usecases.NewUserUsecase(userRepository)
 
+		// サーバー起動
+		web.NewServer(userUseCase)
+	}
 }

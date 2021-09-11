@@ -5,6 +5,7 @@ go 1.16
 require (
 	bitbucket.org/liamstask/goose v0.0.0-20150115234039-8488cc47d90c // indirect
 	github.com/alexbrainman/sspi v0.0.0-20180613141037-e580b900e9f5 // indirect
+	github.com/bxcodec/faker/v3 v3.6.0 // indirect
 	github.com/jackc/pgx/v4 v4.13.0 // indirect
 	github.com/jcmturner/gokrb5/v8 v8.2.0 // indirect
 	github.com/kylelemons/go-gypsy v1.0.0 // indirect
