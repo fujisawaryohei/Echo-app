@@ -1,7 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE users (
-    id CHAR(26) NOT NULL,
+    id SERIAL NOT NULL,
     name VARCHAR(50) NOT NULL,
     email VARCHAR(255) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,

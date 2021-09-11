@@ -1,13 +1,32 @@
 package main
 
 import (
+	"fmt"
+
+	"github.com/fujisawaryohei/echo-app/database"
+	"github.com/fujisawaryohei/echo-app/usecases"
 	"github.com/fujisawaryohei/echo-app/web"
+	"github.com/fujisawaryohei/echo-app/web/gateways"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 func main() {
 	e := echo.New()
 
-	web.NewServer(e)
-	e.Logger.Fatal(e.Start(":8080"))
+	// アクセスロガー
+	e.Use(middleware.Logger())
+
+	// init
+	db, err := database.NewConnection()
+	if err != nil {
+		fmt.Printf("got err, %+v\n", err)
+	}
+
+	userRepository := gateways.NewUserRepository(db)
+	userUseCase := usecases.NewUserUsecase(userRepository)
+
+	// サーバー起動
+	web.NewServer(userUseCase)
+
 }

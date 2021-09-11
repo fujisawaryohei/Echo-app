@@ -1,10 +1,12 @@
 package repositories
 
-import "github.com/fujisawaryohei/echo-app/domain/entities"
+import (
+	"github.com/fujisawaryohei/echo-app/database/dao"
+	"github.com/fujisawaryohei/echo-app/web/dto"
+)
 
-type User interface {
-	FindById(id string) entities.User
-	SaveUser(*entities.User)
-	Update(*entities.User)
-	Delete(*entities.User)
+type UserRepository interface {
+	FindById(id string) (dao.User, error)
+	SaveUser(user *dto.UserDTO) error
+	Delete(id string) error
 }
