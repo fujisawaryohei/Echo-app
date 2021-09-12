@@ -30,3 +30,10 @@ func (u *UserUseCase) StoreUser(user *dto.User) error {
 	}
 	return nil
 }
+
+func (u *UserUseCase) DeleteUser(id int) error {
+	if err := u.userRepository.Delete(id); err != nil {
+		return err
+	}
+	return nil
+}

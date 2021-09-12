@@ -17,6 +17,7 @@ func NewServer(userUseCase *usecases.UserUseCase) {
 	e.GET("/", handlers.Index)
 	e.GET("/users/:id", handlers.Find(userUseCase))
 	e.POST("/users", handlers.StoreUser(userUseCase))
+	e.DELETE("/users/:id", handlers.DeleteUser(userUseCase))
 
 	// サーバー起動
 	e.Logger.Fatal(e.Start(":8080"))

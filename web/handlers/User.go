@@ -9,6 +9,11 @@ import (
 	"github.com/labstack/echo"
 )
 
+type SuccessMsg struct {
+	StatusCode int    `json:"statusCode"`
+	Message    string `json:"message"`
+}
+
 func Find(usecase *usecases.UserUseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, _ := strconv.Atoi(c.Param("id"))
@@ -28,5 +33,16 @@ func StoreUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 		}
 		usecase.StoreUser(u)
 		return c.JSON(http.StatusOK, u)
+	}
+}
+
+func DeleteUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id, _ := strconv.Atoi(c.Param("id"))
+		if err := usecase.DeleteUser(id); err != nil {
+			return err
+		}
+		SuccessMsg := &SuccessMsg{StatusCode: http.StatusOK, Message: "削除が完了しました"}
+		return c.JSON(http.StatusOK, SuccessMsg)
 	}
 }

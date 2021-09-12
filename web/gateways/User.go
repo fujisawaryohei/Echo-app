@@ -18,8 +18,7 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 
 func (repo *UserRepository) FindById(id int) (*dao.User, error) {
 	userDAO := new(dao.User)
-	result := repo.dbConn.First(userDAO, id)
-	if err := result.Error; err != nil {
+	if err := repo.dbConn.First(userDAO, id).Error; err != nil {
 		return userDAO, err
 	}
 	return userDAO, nil
@@ -34,7 +33,7 @@ func (repo *UserRepository) SaveUser(user *dto.User) error {
 }
 
 func (repo *UserRepository) Delete(id int) error {
-	var userDAO dao.User
+	userDAO := new(dao.User)
 	if err := repo.dbConn.Delete(userDAO, id).Error; err != nil {
 		return err
 	}
