@@ -6,6 +6,7 @@ import (
 
 	"github.com/fujisawaryohei/echo-app/usecases"
 	"github.com/fujisawaryohei/echo-app/web/dto"
+	"github.com/fujisawaryohei/echo-app/web/utils"
 	"github.com/labstack/echo"
 )
 
@@ -32,7 +33,7 @@ func StoreUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 			return err
 		}
 		usecase.StoreUser(u)
-		return c.JSON(http.StatusOK, u)
+		return c.JSON(http.StatusOK, utils.NewCreateSuccessMessage())
 	}
 }
 
@@ -42,7 +43,6 @@ func DeleteUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 		if err := usecase.DeleteUser(id); err != nil {
 			return err
 		}
-		SuccessMsg := &SuccessMsg{StatusCode: http.StatusOK, Message: "削除が完了しました"}
-		return c.JSON(http.StatusOK, SuccessMsg)
+		return c.JSON(http.StatusOK, utils.NewDeleteSuccessMessage())
 	}
 }
