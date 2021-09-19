@@ -21,8 +21,10 @@ func Find(usecase *usecases.UserUseCase) echo.HandlerFunc {
 		id, _ := strconv.Atoi(c.Param("id"))
 		user, err := usecase.Find(id)
 		if err != nil {
-			return err
+			errorRes := utils.NewNotFoundMessage(err)
+			return c.JSON(errorRes.Code, errorRes)
 		}
+
 		return c.JSON(http.StatusOK, user)
 	}
 }
@@ -53,8 +55,10 @@ func DeleteUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, _ := strconv.Atoi(c.Param("id"))
 		if err := usecase.DeleteUser(id); err != nil {
-			return err
+			errorRes := utils.NewInternalServerError(err)
+			return c.JSON(errorRes.Code, errorRes)
 		}
+
 		return c.JSON(http.StatusOK, utils.NewSuccessMessage())
 	}
 }

@@ -34,6 +34,16 @@ func NewBadRequestMessage(err error) ErrorResponse {
 	return res
 }
 
+func NewNotFoundMessage(err error) ErrorResponse {
+	var errors []ValidationError
+	res := ErrorResponse{
+		Code:    http.StatusNotFound,
+		Message: "Not Found",
+		Errors:  errors,
+	}
+	return res
+}
+
 func NewInternalServerError(err error) ErrorResponse {
 	var errors []ValidationError
 	res := ErrorResponse{
