@@ -16,7 +16,7 @@ type SuccessMsg struct {
 	Message    string `json:"message"`
 }
 
-func Find(usecase *usecases.UserUseCase) echo.HandlerFunc {
+func FindUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, _ := strconv.Atoi(c.Param("id"))
 		user, err := usecase.Find(id)
