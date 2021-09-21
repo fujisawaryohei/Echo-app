@@ -17,7 +17,7 @@ func NewUserUsecase(repo repositories.UserRepository) *UserUseCase {
 }
 
 func (u *UserUseCase) List() (*[]dao.User, error) {
-	users, err := u.userRepository.UserList()
+	users, err := u.userRepository.List()
 	if err != nil {
 		return users, err
 	}
@@ -33,7 +33,7 @@ func (u *UserUseCase) Find(id int) (*dao.User, error) {
 }
 
 func (u *UserUseCase) Store(user *dto.User) error {
-	if err := u.userRepository.SaveUser(user); err != nil {
+	if err := u.userRepository.Save(user); err != nil {
 		return err
 	}
 	return nil

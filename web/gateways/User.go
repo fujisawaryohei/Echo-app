@@ -16,7 +16,7 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 	}
 }
 
-func (repo *UserRepository) UserList() (*[]dao.User, error) {
+func (repo *UserRepository) List() (*[]dao.User, error) {
 	usersDAO := new([]dao.User)
 	if err := repo.dbConn.Find(usersDAO).Error; err != nil {
 		return usersDAO, err
@@ -32,7 +32,7 @@ func (repo *UserRepository) FindById(id int) (*dao.User, error) {
 	return userDAO, nil
 }
 
-func (repo *UserRepository) SaveUser(user *dto.User) error {
+func (repo *UserRepository) Save(user *dto.User) error {
 	userDAO := dao.User{}
 	dao := userDAO.ConvertToDAO(user)
 	if err := repo.dbConn.Create(dao).Error; err != nil {
