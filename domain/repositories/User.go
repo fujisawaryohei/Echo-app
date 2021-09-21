@@ -6,6 +6,7 @@ import (
 )
 
 type UserRepository interface {
+	UserList() (*[]dao.User, error)
 	FindById(id int) (*dao.User, error)
 	SaveUser(user *dto.User) error
 	Delete(id int) error

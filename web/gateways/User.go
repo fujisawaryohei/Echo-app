@@ -16,6 +16,14 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 	}
 }
 
+func (repo *UserRepository) UserList() (*[]dao.User, error) {
+	usersDAO := new([]dao.User)
+	if err := repo.dbConn.Find(usersDAO).Error; err != nil {
+		return usersDAO, err
+	}
+	return usersDAO, nil
+}
+
 func (repo *UserRepository) FindById(id int) (*dao.User, error) {
 	userDAO := new(dao.User)
 	if err := repo.dbConn.First(userDAO, id).Error; err != nil {
@@ -25,7 +33,7 @@ func (repo *UserRepository) FindById(id int) (*dao.User, error) {
 }
 
 func (repo *UserRepository) SaveUser(user *dto.User) error {
-	var userDAO dao.User
+	userDAO := dao.User{}
 	dao := userDAO.ConvertToDAO(user)
 	if err := repo.dbConn.Create(dao).Error; err != nil {
 		return err

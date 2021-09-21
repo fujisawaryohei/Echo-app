@@ -16,6 +16,14 @@ func NewUserUsecase(repo repositories.UserRepository) *UserUseCase {
 	}
 }
 
+func (u *UserUseCase) List() (*[]dao.User, error) {
+	users, err := u.userRepository.UserList()
+	if err != nil {
+		return users, err
+	}
+	return users, err
+}
+
 func (u *UserUseCase) Find(id int) (*dao.User, error) {
 	user, err := u.userRepository.FindById(id)
 	if err != nil {
@@ -24,14 +32,14 @@ func (u *UserUseCase) Find(id int) (*dao.User, error) {
 	return user, nil
 }
 
-func (u *UserUseCase) StoreUser(user *dto.User) error {
+func (u *UserUseCase) Store(user *dto.User) error {
 	if err := u.userRepository.SaveUser(user); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (u *UserUseCase) DeleteUser(id int) error {
+func (u *UserUseCase) Delete(id int) error {
 	if err := u.userRepository.Delete(id); err != nil {
 		return err
 	}

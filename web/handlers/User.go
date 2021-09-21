@@ -16,6 +16,14 @@ type SuccessMsg struct {
 	Message    string `json:"message"`
 }
 
+func UserList(usecase *usecases.UserUseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		// TODO: エラーハンドリングの対象としての想定は401なので一旦必要なし
+		users, _ := usecase.List()
+		return c.JSON(http.StatusOK, users)
+	}
+}
+
 func FindUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, _ := strconv.Atoi(c.Param("id"))
@@ -42,7 +50,7 @@ func StoreUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 			return c.JSON(errorRes.Code, errorRes)
 		}
 
-		if err := usecase.StoreUser(u); err != nil {
+		if err := usecase.Store(u); err != nil {
 			errorRes := utils.NewInternalServerError(err)
 			return c.JSON(errorRes.Code, errorRes)
 		}
@@ -54,7 +62,7 @@ func StoreUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 func DeleteUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, _ := strconv.Atoi(c.Param("id"))
-		if err := usecase.DeleteUser(id); err != nil {
+		if err := usecase.Delete(id); err != nil {
 			errorRes := utils.NewInternalServerError(err)
 			return c.JSON(errorRes.Code, errorRes)
 		}
