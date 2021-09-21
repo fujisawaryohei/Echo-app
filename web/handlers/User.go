@@ -59,6 +59,25 @@ func StoreUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 	}
 }
 
+func UpdateUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id, _ := strconv.Atoi(c.Param("id"))
+		newDTO := new(dto.User)
+
+		if err := c.Bind(newDTO); err != nil {
+			// TODO: 何に対してのエラーハンドリングなのかを特定する
+			return c.JSON(http.StatusBadRequest, "It contains invalid Value")
+		}
+
+		if err := usecase.Update(id, newDTO); err != nil {
+			errorRes := utils.NewNotFoundMessage(err)
+			return c.JSON(errorRes.Code, errorRes)
+		}
+
+		return c.JSON(http.StatusOK, utils.NewSuccessMessage())
+	}
+}
+
 func DeleteUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, _ := strconv.Atoi(c.Param("id"))

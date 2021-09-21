@@ -39,6 +39,13 @@ func (u *UserUseCase) Store(user *dto.User) error {
 	return nil
 }
 
+func (u *UserUseCase) Update(id int, newDTO *dto.User) error {
+	if err := u.userRepository.Update(id, newDTO); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (u *UserUseCase) Delete(id int) error {
 	if err := u.userRepository.Delete(id); err != nil {
 		return err

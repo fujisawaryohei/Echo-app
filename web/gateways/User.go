@@ -41,6 +41,16 @@ func (repo *UserRepository) SaveUser(user *dto.User) error {
 	return nil
 }
 
+func (repo *UserRepository) Update(id int, newDTO *dto.User) error {
+	user, _ := repo.FindById(id)
+	newDAO := dao.User{}.ConvertToDAO(newDTO)
+	if err := repo.dbConn.Model(user).Updates(newDAO).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (repo *UserRepository) Delete(id int) error {
 	userDAO := new(dao.User)
 	if err := repo.dbConn.Delete(userDAO, id).Error; err != nil {
