@@ -5,16 +5,12 @@ import (
 	"strconv"
 
 	"github.com/fujisawaryohei/echo-app/usecases"
+	"github.com/fujisawaryohei/echo-app/web/auth"
 	"github.com/fujisawaryohei/echo-app/web/dto"
 	"github.com/fujisawaryohei/echo-app/web/utils"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo"
 )
-
-type SuccessMsg struct {
-	StatusCode int    `json:"statusCode"`
-	Message    string `json:"message"`
-}
 
 func UserList(usecase *usecases.UserUseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -87,5 +83,30 @@ func DeleteUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, utils.NewSuccessMessage())
+	}
+}
+
+func Login(usecase *usecases.UserUseCase) echo.HandlerFunc {
+	u := new(dto.LoginUser)
+	return func(c echo.Context) error {
+		if err := c.Bind(u); err != nil {
+			return c.JSON(http.StatusBadRequest, "It contains invalid Value")
+		}
+
+		userDAO, err := usecase.FindByEmail(u.Email)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, echo.ErrNotFound)
+		}
+
+		if err := utils.Compare(userDAO.Password, u.Password); err != nil || userDAO.Email != u.Email {
+			return c.JSON(http.StatusUnauthorized, echo.ErrUnauthorized)
+		}
+
+		signing_token, err := auth.GenerateToken(u.Email)
+		if err != nil {
+			return echo.ErrInternalServerError
+		}
+
+		return c.JSON(http.StatusOK, echo.Map{"token": signing_token})
 	}
 }

@@ -2,6 +2,7 @@ package web
 
 import (
 	"github.com/fujisawaryohei/echo-app/usecases"
+	"github.com/fujisawaryohei/echo-app/web/auth"
 	"github.com/fujisawaryohei/echo-app/web/handlers"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -13,13 +14,22 @@ func NewServer(userUseCase *usecases.UserUseCase) {
 	// アクセスロガー
 	e.Use(middleware.Logger())
 
+	config := middleware.JWTConfig{
+		Claims:     &auth.JwtCustomClaim{},
+		SigningKey: []byte("secret"),
+	}
+
 	// routing
 	e.GET("/", handlers.Index)
-	e.GET("/users", handlers.UserList(userUseCase))
-	e.POST("/users", handlers.StoreUser(userUseCase))
-	e.GET("/users/:id", handlers.FindUser(userUseCase))
-	e.PATCH("/users/:id", handlers.UpdateUser(userUseCase))
-	e.DELETE("/users/:id", handlers.DeleteUser(userUseCase))
+	e.POST("/signup", handlers.StoreUser(userUseCase))
+	e.POST("/login", handlers.Login(userUseCase))
+
+	r := e.Group("/users")
+	r.Use(middleware.JWTWithConfig(config))
+	r.GET("", handlers.UserList(userUseCase))
+	r.GET("/:id", handlers.FindUser(userUseCase))
+	r.PATCH("/:id", handlers.UpdateUser(userUseCase))
+	r.DELETE("/:id", handlers.DeleteUser(userUseCase))
 
 	// サーバー起動
 	e.Logger.Fatal(e.Start(":8080"))

@@ -32,6 +32,14 @@ func (u *UserUseCase) Find(id int) (*dao.User, error) {
 	return user, nil
 }
 
+func (u *UserUseCase) FindByEmail(email string) (*dao.User, error) {
+	user, err := u.userRepository.FindByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+	return user, err
+}
+
 func (u *UserUseCase) Store(user *dto.User) error {
 	if err := u.userRepository.Save(user); err != nil {
 		return err

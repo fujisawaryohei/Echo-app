@@ -26,7 +26,17 @@ func (repo *UserRepository) List() (*[]dao.User, error) {
 
 func (repo *UserRepository) FindById(id int) (*dao.User, error) {
 	userDAO := new(dao.User)
+	// TODO: 500, 404を別々に判定できるように各異常系に対して型/定数を用意する
 	if err := repo.dbConn.First(userDAO, id).Error; err != nil {
+		return userDAO, err
+	}
+	return userDAO, nil
+}
+
+func (repo *UserRepository) FindByEmail(email string) (*dao.User, error) {
+	userDAO := new(dao.User)
+	// TODO: 500, 404を別々に判定できるように各異常系に対して型/定数を用意する
+	if err := repo.dbConn.First(userDAO, "email=?", email).Error; err != nil {
 		return userDAO, err
 	}
 	return userDAO, nil
