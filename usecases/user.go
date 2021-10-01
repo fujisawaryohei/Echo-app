@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/fujisawaryohei/echo-app/codes"
-	"github.com/fujisawaryohei/echo-app/database/dao"
+	"github.com/fujisawaryohei/echo-app/database"
 	"github.com/fujisawaryohei/echo-app/domain/entities"
 	"github.com/fujisawaryohei/echo-app/domain/repositories"
 	"github.com/fujisawaryohei/echo-app/web/dto"
@@ -21,7 +21,7 @@ func NewUserUsecase(repo repositories.UserRepository) *UserUseCase {
 	}
 }
 
-func (u *UserUseCase) List() (*[]dao.User, error) {
+func (u *UserUseCase) List() (*[]database.User, error) {
 	users, err := u.userRepository.List()
 	if err != nil {
 		return users, fmt.Errorf("usecases/user.go list err: %s", err)
@@ -29,7 +29,7 @@ func (u *UserUseCase) List() (*[]dao.User, error) {
 	return users, err
 }
 
-func (u *UserUseCase) Find(id int) (*dao.User, error) {
+func (u *UserUseCase) Find(id int) (*database.User, error) {
 	user, err := u.userRepository.FindById(id)
 	if err != nil {
 		if errors.Is(err, codes.ErrUserNotFound) {
@@ -40,7 +40,7 @@ func (u *UserUseCase) Find(id int) (*dao.User, error) {
 	return user, nil
 }
 
-func (u *UserUseCase) FindByEmail(email string) (*dao.User, error) {
+func (u *UserUseCase) FindByEmail(email string) (*database.User, error) {
 	user, err := u.userRepository.FindByEmail(email)
 	if err != nil {
 		if errors.Is(err, codes.ErrUserNotFound) {

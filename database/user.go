@@ -1,4 +1,4 @@
-package dao
+package database
 
 import (
 	"time"
@@ -17,7 +17,7 @@ type User struct {
 	UpdatedAt            time.Time
 }
 
-func (User) ConvertToDAO(user *dto.User) *User {
+func ConvertToUser(user *dto.User) *User {
 	return &User{
 		Name:                 user.Name,
 		Email:                user.Email,

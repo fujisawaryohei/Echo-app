@@ -43,17 +43,17 @@ func FindUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 
 func StoreUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := new(dto.User)
-		if err := c.Bind(u); err != nil {
+		userDTO := new(dto.User)
+		if err := c.Bind(userDTO); err != nil {
 			// TODO: いい感じにする
 			return c.JSON(http.StatusBadRequest, "It contains an invalid value")
 		}
 
-		if err := validator.New().Struct(u); err != nil {
+		if err := validator.New().Struct(userDTO); err != nil {
 			return c.JSON(http.StatusBadRequest, utils.NewBadRequestMessage(err))
 		}
 
-		if err := usecase.Store(u); err != nil {
+		if err := usecase.Store(userDTO); err != nil {
 			if errors.Is(err, codes.ErrUserAlreadyExisted) {
 				return c.JSON(http.StatusConflict, utils.NewConflic())
 			}
@@ -67,14 +67,18 @@ func StoreUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 func UpdateUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, _ := strconv.Atoi(c.Param("id"))
-		newDTO := new(dto.User)
+		userDTO := new(dto.User)
 
-		if err := c.Bind(newDTO); err != nil {
+		if err := c.Bind(userDTO); err != nil {
 			// TODO: いい感じにする
 			return c.JSON(http.StatusBadRequest, "It contains invalid Value")
 		}
 
-		if err := usecase.Update(id, newDTO); err != nil {
+		if err := validator.New().Struct(userDTO); err != nil {
+			return c.JSON(http.StatusBadRequest, utils.NewBadRequestMessage(err))
+		}
+
+		if err := usecase.Update(id, userDTO); err != nil {
 			if errors.Is(err, codes.ErrUserNotFound) {
 				return c.JSON(http.StatusNotFound, utils.NewNotFoundMessage())
 			}
@@ -97,30 +101,30 @@ func DeleteUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 }
 
 func Login(usecase *usecases.UserUseCase) echo.HandlerFunc {
-	u := new(dto.LoginUser)
+	loginUserDTO := new(dto.LoginUser)
 	return func(c echo.Context) error {
-		if err := c.Bind(u); err != nil {
+		if err := c.Bind(loginUserDTO); err != nil {
 			return c.JSON(http.StatusBadRequest, "It contains invalid Value")
 		}
 
-		if err := validator.New().Struct(u); err != nil {
+		if err := validator.New().Struct(loginUserDTO); err != nil {
 			return c.JSON(http.StatusBadRequest, utils.NewBadRequestMessage(err))
 		}
 
-		userDAO, err := usecase.FindByEmail(u.Email)
+		user, err := usecase.FindByEmail(loginUserDTO.Email)
 		if err != nil {
 			if errors.Is(err, codes.ErrUserNotFound) {
-				return c.JSON(http.StatusBadRequest, utils.NewNotFoundMessage())
+				return c.JSON(http.StatusNotFound, utils.NewNotFoundMessage())
 			}
 			log.Println(err.Error())
 			return c.JSON(http.StatusInternalServerError, utils.NewInternalServerError())
 		}
 
-		if err := utils.Compare(userDAO.Password, u.Password); err != nil || userDAO.Email != u.Email {
+		if err := utils.Compare(user.Password, loginUserDTO.Password); err != nil || user.Email != loginUserDTO.Email {
 			return c.JSON(http.StatusUnauthorized, utils.NewUnauthorized())
 		}
 
-		signing_token, err := auth.GenerateToken(u.Email)
+		signing_token, err := auth.GenerateToken(loginUserDTO.Email)
 		if err != nil {
 			return echo.ErrInternalServerError
 		}
