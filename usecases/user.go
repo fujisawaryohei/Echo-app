@@ -6,6 +6,7 @@ import (
 
 	"github.com/fujisawaryohei/echo-app/codes"
 	"github.com/fujisawaryohei/echo-app/database/dao"
+	"github.com/fujisawaryohei/echo-app/domain/entities"
 	"github.com/fujisawaryohei/echo-app/domain/repositories"
 	"github.com/fujisawaryohei/echo-app/web/dto"
 )
@@ -50,8 +51,11 @@ func (u *UserUseCase) FindByEmail(email string) (*dao.User, error) {
 	return user, err
 }
 
-func (u *UserUseCase) Store(user *dto.User) error {
-	if err := u.userRepository.Save(user); err != nil {
+// 原則レイヤ間のデータのやり取りはDTOを使用する。
+// アプリケーション固有のロジックが発生した場合は、ドメインモデルを呼び出して処理してDTOに変換して別レイヤに渡す流れを取る。
+func (u *UserUseCase) Store(userDTO *dto.User) error {
+	user := entities.NewUser(userDTO.Name, userDTO.Email, userDTO.Password, userDTO.PasswordConfirmation)
+	if err := u.userRepository.Save(user.ConvertToDTO()); err != nil {
 		if errors.Is(err, codes.ErrUserAlreadyExisted) {
 			return codes.ErrUserAlreadyExisted
 		}
@@ -60,8 +64,9 @@ func (u *UserUseCase) Store(user *dto.User) error {
 	return nil
 }
 
-func (u *UserUseCase) Update(id int, newDTO *dto.User) error {
-	if err := u.userRepository.Update(id, newDTO); err != nil {
+func (u *UserUseCase) Update(id int, userDTO *dto.User) error {
+	user := entities.NewUser(userDTO.Name, userDTO.Email, userDTO.Password, userDTO.PasswordConfirmation)
+	if err := u.userRepository.Update(id, user.ConvertToDTO()); err != nil {
 		if errors.Is(err, codes.ErrUserNotFound) {
 			return codes.ErrUserNotFound
 		}
