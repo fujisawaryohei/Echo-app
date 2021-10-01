@@ -103,6 +103,10 @@ func Login(usecase *usecases.UserUseCase) echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, "It contains invalid Value")
 		}
 
+		if err := validator.New().Struct(u); err != nil {
+			return c.JSON(http.StatusBadRequest, utils.NewBadRequestMessage(err))
+		}
+
 		userDAO, err := usecase.FindByEmail(u.Email)
 		if err != nil {
 			if errors.Is(err, codes.ErrUserNotFound) {
