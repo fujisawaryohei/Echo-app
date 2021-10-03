@@ -54,14 +54,11 @@ func (repo *UserRepository) FindByEmail(email string) (*database.User, error) {
 func (repo *UserRepository) Save(userDTO *dto.User) error {
 	user := database.ConvertToUser(userDTO)
 	if err := repo.dbConn.Create(user).Error; err != nil {
-		// TODO: errors.As について調べてリファクタする
 		// https://github.com/go-gorm/gorm/issues/4135
 		var pgErr *pgconn.PgError
-		errors.As(err, &pgErr)
-		if pgErr.Code == "23505" {
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
 			return codes.ErrUserEmailAlreadyExisted
 		}
-		fmt.Println(pgErr.Code)
 		return fmt.Errorf("gateway/user.go Save err: %w", err)
 	}
 	return nil
