@@ -10,6 +10,7 @@ import (
 	"github.com/fujisawaryohei/echo-app/usecases"
 	"github.com/fujisawaryohei/echo-app/web/auth"
 	"github.com/fujisawaryohei/echo-app/web/dto"
+	"github.com/fujisawaryohei/echo-app/web/response"
 	"github.com/fujisawaryohei/echo-app/web/utils"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo"
@@ -20,7 +21,7 @@ func UserList(usecase *usecases.UserUseCase) echo.HandlerFunc {
 		users, err := usecase.List()
 		if err != nil {
 			log.Println(err.Error())
-			return c.JSON(http.StatusInternalServerError, utils.NewInternalServerError())
+			return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
 		}
 		return c.JSON(http.StatusOK, users)
 	}
@@ -32,10 +33,10 @@ func FindUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 		user, err := usecase.Find(id)
 		if err != nil {
 			if errors.Is(err, codes.ErrUserNotFound) {
-				return c.JSON(http.StatusNotFound, utils.NewNotFoundMessage())
+				return c.JSON(http.StatusNotFound, response.NewNotFoundMessage())
 			}
 			log.Println(err.Error())
-			return c.JSON(http.StatusInternalServerError, utils.NewInternalServerError())
+			return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
 		}
 		return c.JSON(http.StatusOK, user)
 	}
@@ -50,17 +51,17 @@ func StoreUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 		}
 
 		if err := validator.New().Struct(userDTO); err != nil {
-			return c.JSON(http.StatusBadRequest, utils.NewBadRequestMessage(err))
+			return c.JSON(http.StatusBadRequest, response.NewBadRequestMessage(err))
 		}
 
 		if err := usecase.Store(userDTO); err != nil {
 			if errors.Is(err, codes.ErrUserAlreadyExisted) {
-				return c.JSON(http.StatusConflict, utils.NewConflic())
+				return c.JSON(http.StatusConflict, response.NewConflic())
 			}
 			log.Println(err.Error())
-			return c.JSON(http.StatusInternalServerError, utils.NewInternalServerError())
+			return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
 		}
-		return c.JSON(http.StatusCreated, utils.NewSuccessMessage())
+		return c.JSON(http.StatusCreated, response.NewSuccessMessage())
 	}
 }
 
@@ -75,17 +76,17 @@ func UpdateUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 		}
 
 		if err := validator.New().Struct(userDTO); err != nil {
-			return c.JSON(http.StatusBadRequest, utils.NewBadRequestMessage(err))
+			return c.JSON(http.StatusBadRequest, response.NewBadRequestMessage(err))
 		}
 
 		if err := usecase.Update(id, userDTO); err != nil {
 			if errors.Is(err, codes.ErrUserNotFound) {
-				return c.JSON(http.StatusNotFound, utils.NewNotFoundMessage())
+				return c.JSON(http.StatusNotFound, response.NewNotFoundMessage())
 			}
 			log.Println(err.Error())
-			return c.JSON(http.StatusInternalServerError, utils.NewInternalServerError())
+			return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
 		}
-		return c.JSON(http.StatusOK, utils.NewSuccessMessage())
+		return c.JSON(http.StatusOK, response.NewSuccessMessage())
 	}
 }
 
@@ -94,34 +95,34 @@ func DeleteUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 		id, _ := strconv.Atoi(c.Param("id"))
 		if err := usecase.Delete(id); err != nil {
 			log.Println(err.Error())
-			return c.JSON(http.StatusOK, utils.NewInternalServerError())
+			return c.JSON(http.StatusOK, response.NewInternalServerError())
 		}
-		return c.JSON(http.StatusOK, utils.NewSuccessMessage())
+		return c.JSON(http.StatusOK, response.NewSuccessMessage())
 	}
 }
 
 func Login(usecase *usecases.UserUseCase) echo.HandlerFunc {
-	loginUserDTO := new(dto.LoginUser)
 	return func(c echo.Context) error {
+		loginUserDTO := new(dto.LoginUser)
 		if err := c.Bind(loginUserDTO); err != nil {
 			return c.JSON(http.StatusBadRequest, "It contains invalid Value")
 		}
 
 		if err := validator.New().Struct(loginUserDTO); err != nil {
-			return c.JSON(http.StatusBadRequest, utils.NewBadRequestMessage(err))
+			return c.JSON(http.StatusBadRequest, response.NewBadRequestMessage(err))
 		}
 
 		user, err := usecase.FindByEmail(loginUserDTO.Email)
 		if err != nil {
 			if errors.Is(err, codes.ErrUserNotFound) {
-				return c.JSON(http.StatusNotFound, utils.NewNotFoundMessage())
+				return c.JSON(http.StatusNotFound, response.NewNotFoundMessage())
 			}
 			log.Println(err.Error())
-			return c.JSON(http.StatusInternalServerError, utils.NewInternalServerError())
+			return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
 		}
 
 		if err := utils.Compare(user.Password, loginUserDTO.Password); err != nil || user.Email != loginUserDTO.Email {
-			return c.JSON(http.StatusUnauthorized, utils.NewUnauthorized())
+			return c.JSON(http.StatusUnauthorized, response.NewUnauthorized())
 		}
 
 		signing_token, err := auth.GenerateToken(loginUserDTO.Email)
