@@ -47,7 +47,7 @@ func NewNotFoundMessage() ErrorResponse {
 func NewUnauthorized() ErrorResponse {
 	var errors []ValidationError
 	res := ErrorResponse{
-		Code:    http.StatusNotFound,
+		Code:    http.StatusUnauthorized,
 		Message: "unauthorized",
 		Errors:  errors,
 	}
