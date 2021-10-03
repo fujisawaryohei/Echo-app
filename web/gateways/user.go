@@ -7,6 +7,7 @@ import (
 	"github.com/fujisawaryohei/echo-app/codes"
 	"github.com/fujisawaryohei/echo-app/database"
 	"github.com/fujisawaryohei/echo-app/web/dto"
+	"github.com/jackc/pgconn"
 	"gorm.io/gorm"
 )
 
@@ -53,9 +54,14 @@ func (repo *UserRepository) FindByEmail(email string) (*database.User, error) {
 func (repo *UserRepository) Save(userDTO *dto.User) error {
 	user := database.ConvertToUser(userDTO)
 	if err := repo.dbConn.Create(user).Error; err != nil {
-		if errors.Is(err, gorm.ErrRegistered) {
-			return codes.ErrUserAlreadyExisted
+		// TODO: errors.As について調べてリファクタする
+		// https://github.com/go-gorm/gorm/issues/4135
+		var pgErr *pgconn.PgError
+		errors.As(err, &pgErr)
+		if pgErr.Code == "23505" {
+			return codes.ErrUserEmailAlreadyExisted
 		}
+		fmt.Println(pgErr.Code)
 		return fmt.Errorf("gateway/user.go Save err: %s", err)
 	}
 	return nil

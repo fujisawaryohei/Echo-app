@@ -55,7 +55,7 @@ func StoreUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 		}
 
 		if err := usecase.Store(userDTO); err != nil {
-			if errors.Is(err, codes.ErrUserAlreadyExisted) {
+			if errors.Is(err, codes.ErrUserEmailAlreadyExisted) {
 				return c.JSON(http.StatusConflict, response.NewConflic())
 			}
 			log.Println(err.Error())

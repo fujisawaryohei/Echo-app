@@ -56,8 +56,8 @@ func (u *UserUseCase) FindByEmail(email string) (*database.User, error) {
 func (u *UserUseCase) Store(userDTO *dto.User) error {
 	user := entities.NewUser(userDTO.Name, userDTO.Email, userDTO.Password, userDTO.PasswordConfirmation)
 	if err := u.userRepository.Save(user.ConvertToDTO()); err != nil {
-		if errors.Is(err, codes.ErrUserAlreadyExisted) {
-			return codes.ErrUserAlreadyExisted
+		if errors.Is(err, codes.ErrUserEmailAlreadyExisted) {
+			return codes.ErrUserEmailAlreadyExisted
 		}
 		return fmt.Errorf("usecases/user.go Store err: %s", err)
 	}
