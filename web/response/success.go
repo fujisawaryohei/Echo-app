@@ -7,9 +7,16 @@ type SuccessResponse struct {
 	Message string `json:"message"`
 }
 
-func NewSuccessMessage() SuccessResponse {
+func NewSuccess() SuccessResponse {
 	return SuccessResponse{
 		Code:    http.StatusOK,
 		Message: "success",
+	}
+}
+
+func NewCreated() SuccessResponse {
+	return SuccessResponse{
+		Code:    http.StatusCreated,
+		Message: "created",
 	}
 }

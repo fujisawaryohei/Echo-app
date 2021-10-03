@@ -8,6 +8,7 @@ var (
 
 	// 400系エラー
 	ErrUserNotFound            = errors.New("user not found")
+	ErrUserUnAuthorized        = errors.New("user not unauthorized")
 	ErrUserEmailAlreadyExisted = errors.New("email has already existed")
 	ErrUserNameRequired        = errors.New("name is required")
 	ErrUserEmailRequired       = errors.New("email is required")

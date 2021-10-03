@@ -3,12 +3,14 @@ package usecases
 import (
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/fujisawaryohei/echo-app/codes"
 	"github.com/fujisawaryohei/echo-app/database"
 	"github.com/fujisawaryohei/echo-app/domain/entities"
 	"github.com/fujisawaryohei/echo-app/domain/repositories"
 	"github.com/fujisawaryohei/echo-app/web/dto"
+	"github.com/fujisawaryohei/echo-app/web/utils"
 )
 
 type UserUseCase struct {
@@ -60,6 +62,22 @@ func (u *UserUseCase) Store(userDTO *dto.User) error {
 			return codes.ErrUserEmailAlreadyExisted
 		}
 		return fmt.Errorf("usecases/user.go Store err: %w", err)
+	}
+	return nil
+}
+
+func (u *UserUseCase) Login(loginUserDTO *dto.LoginUser) error {
+	user, err := u.FindByEmail(loginUserDTO.Email)
+	if err != nil {
+		if errors.Is(err, codes.ErrUserNotFound) {
+			return codes.ErrUserNotFound
+		}
+		log.Println(err.Error())
+		return fmt.Errorf("usecases/user.go Login err: %w", err)
+	}
+
+	if err := utils.Compare(user.Password, loginUserDTO.Password); err != nil || user.Email != loginUserDTO.Email {
+		return codes.ErrUserUnAuthorized
 	}
 	return nil
 }

@@ -11,7 +11,6 @@ import (
 	"github.com/fujisawaryohei/echo-app/web/auth"
 	"github.com/fujisawaryohei/echo-app/web/dto"
 	"github.com/fujisawaryohei/echo-app/web/response"
-	"github.com/fujisawaryohei/echo-app/web/utils"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo"
 )
@@ -61,7 +60,7 @@ func StoreUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 			log.Println(err.Error())
 			return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
 		}
-		return c.JSON(http.StatusCreated, response.NewSuccessMessage())
+		return c.JSON(http.StatusCreated, response.NewCreated())
 	}
 }
 
@@ -86,7 +85,7 @@ func UpdateUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 			log.Println(err.Error())
 			return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
 		}
-		return c.JSON(http.StatusOK, response.NewSuccessMessage())
+		return c.JSON(http.StatusOK, response.NewSuccess())
 	}
 }
 
@@ -97,7 +96,7 @@ func DeleteUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 			log.Println(err.Error())
 			return c.JSON(http.StatusOK, response.NewInternalServerError())
 		}
-		return c.JSON(http.StatusOK, response.NewSuccessMessage())
+		return c.JSON(http.StatusOK, response.NewSuccess())
 	}
 }
 
@@ -112,17 +111,16 @@ func Login(usecase *usecases.UserUseCase) echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, response.NewBadRequest(err))
 		}
 
-		user, err := usecase.FindByEmail(loginUserDTO.Email)
-		if err != nil {
+		if err := usecase.Login(loginUserDTO); err != nil {
 			if errors.Is(err, codes.ErrUserNotFound) {
 				return c.JSON(http.StatusNotFound, response.NewNotFound())
 			}
+
+			if errors.Is(err, codes.ErrUserUnAuthorized) {
+				return c.JSON(http.StatusUnauthorized, response.NewUnauthorized())
+			}
 			log.Println(err.Error())
 			return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
-		}
-
-		if err := utils.Compare(user.Password, loginUserDTO.Password); err != nil || user.Email != loginUserDTO.Email {
-			return c.JSON(http.StatusUnauthorized, response.NewUnauthorized())
 		}
 
 		signing_token, err := auth.GenerateToken(loginUserDTO.Email)
@@ -130,6 +128,6 @@ func Login(usecase *usecases.UserUseCase) echo.HandlerFunc {
 			return echo.ErrInternalServerError
 		}
 
-		return c.JSON(http.StatusOK, echo.Map{"token": signing_token})
+		return c.JSON(http.StatusOK, echo.Map{"access_token": signing_token})
 	}
 }
