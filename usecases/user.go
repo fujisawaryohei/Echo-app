@@ -9,6 +9,7 @@ import (
 	"github.com/fujisawaryohei/echo-app/database"
 	"github.com/fujisawaryohei/echo-app/domain/entities"
 	"github.com/fujisawaryohei/echo-app/domain/repositories"
+	"github.com/fujisawaryohei/echo-app/web/auth"
 	"github.com/fujisawaryohei/echo-app/web/dto"
 	"github.com/fujisawaryohei/echo-app/web/utils"
 )
@@ -55,31 +56,43 @@ func (u *UserUseCase) FindByEmail(email string) (*database.User, error) {
 
 // 原則レイヤ間のデータのやり取りはDTOを使用する。
 // アプリケーション固有のロジックが発生した場合は、ドメインモデルを呼び出して処理してDTOに変換して別レイヤに渡す流れを取る。
-func (u *UserUseCase) Store(userDTO *dto.User) error {
+func (u *UserUseCase) Store(userDTO *dto.User) (string, error) {
 	user := entities.NewUser(userDTO.Name, userDTO.Email, userDTO.Password, userDTO.PasswordConfirmation)
 	if err := u.userRepository.Save(user.ConvertToDTO()); err != nil {
 		if errors.Is(err, codes.ErrUserEmailAlreadyExisted) {
-			return codes.ErrUserEmailAlreadyExisted
+			return "", codes.ErrUserEmailAlreadyExisted
 		}
-		return fmt.Errorf("usecases/user.go Store err: %w", err)
+		return "", fmt.Errorf("usecases/user.go Store err: %w", err)
 	}
-	return nil
+
+	sigining_token, err := auth.GenerateToken(user.Email)
+	if err != nil {
+		return "", codes.ErrInternalServerError
+	}
+
+	return sigining_token, nil
 }
 
-func (u *UserUseCase) Login(loginUserDTO *dto.LoginUser) error {
+func (u *UserUseCase) Login(loginUserDTO *dto.LoginUser) (string, error) {
 	user, err := u.FindByEmail(loginUserDTO.Email)
 	if err != nil {
 		if errors.Is(err, codes.ErrUserNotFound) {
-			return codes.ErrUserNotFound
+			return "", codes.ErrUserNotFound
 		}
 		log.Println(err.Error())
-		return fmt.Errorf("usecases/user.go Login err: %w", err)
+		return "", fmt.Errorf("usecases/user.go Login err: %w", err)
 	}
 
 	if err := utils.Compare(user.Password, loginUserDTO.Password); err != nil || user.Email != loginUserDTO.Email {
-		return codes.ErrUserUnAuthorized
+		return "", codes.ErrUserUnAuthorized
 	}
-	return nil
+
+	signing_token, err := auth.GenerateToken(loginUserDTO.Email)
+	if err != nil {
+		return "", codes.ErrInternalServerError
+	}
+
+	return signing_token, nil
 }
 
 func (u *UserUseCase) Update(id int, userDTO *dto.User) error {

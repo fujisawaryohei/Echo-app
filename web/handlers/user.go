@@ -8,7 +8,6 @@ import (
 
 	"github.com/fujisawaryohei/echo-app/codes"
 	"github.com/fujisawaryohei/echo-app/usecases"
-	"github.com/fujisawaryohei/echo-app/web/auth"
 	"github.com/fujisawaryohei/echo-app/web/dto"
 	"github.com/fujisawaryohei/echo-app/web/response"
 	"github.com/go-playground/validator/v10"
@@ -53,14 +52,15 @@ func StoreUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, response.NewBadRequest(err))
 		}
 
-		if err := usecase.Store(userDTO); err != nil {
+		signing_token, err := usecase.Store(userDTO)
+		if err != nil {
 			if errors.Is(err, codes.ErrUserEmailAlreadyExisted) {
 				return c.JSON(http.StatusConflict, response.NewConflic())
 			}
 			log.Println(err.Error())
 			return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
 		}
-		return c.JSON(http.StatusCreated, response.NewCreated())
+		return c.JSON(http.StatusCreated, echo.Map{"access_token": signing_token})
 	}
 }
 
@@ -68,7 +68,6 @@ func UpdateUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, _ := strconv.Atoi(c.Param("id"))
 		userDTO := new(dto.User)
-
 		if err := c.Bind(userDTO); err != nil {
 			// TODO: いい感じにする
 			return c.JSON(http.StatusBadRequest, "It contains invalid Value")
@@ -111,7 +110,8 @@ func Login(usecase *usecases.UserUseCase) echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, response.NewBadRequest(err))
 		}
 
-		if err := usecase.Login(loginUserDTO); err != nil {
+		signing_token, err := usecase.Login(loginUserDTO)
+		if err != nil {
 			if errors.Is(err, codes.ErrUserNotFound) {
 				return c.JSON(http.StatusNotFound, response.NewNotFound())
 			}
@@ -121,11 +121,6 @@ func Login(usecase *usecases.UserUseCase) echo.HandlerFunc {
 			}
 			log.Println(err.Error())
 			return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
-		}
-
-		signing_token, err := auth.GenerateToken(loginUserDTO.Email)
-		if err != nil {
-			return echo.ErrInternalServerError
 		}
 
 		return c.JSON(http.StatusOK, echo.Map{"access_token": signing_token})
