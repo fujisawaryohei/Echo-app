@@ -33,7 +33,7 @@ func FindUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 		user, err := usecase.Find(id)
 		if err != nil {
 			if errors.Is(err, codes.ErrUserNotFound) {
-				return c.JSON(http.StatusNotFound, response.NewNotFoundMessage())
+				return c.JSON(http.StatusNotFound, response.NewNotFound())
 			}
 			log.Println(err.Error())
 			return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
@@ -51,7 +51,7 @@ func StoreUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 		}
 
 		if err := validator.New().Struct(userDTO); err != nil {
-			return c.JSON(http.StatusBadRequest, response.NewBadRequestMessage(err))
+			return c.JSON(http.StatusBadRequest, response.NewBadRequest(err))
 		}
 
 		if err := usecase.Store(userDTO); err != nil {
@@ -76,12 +76,12 @@ func UpdateUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 		}
 
 		if err := validator.New().Struct(userDTO); err != nil {
-			return c.JSON(http.StatusBadRequest, response.NewBadRequestMessage(err))
+			return c.JSON(http.StatusBadRequest, response.NewBadRequest(err))
 		}
 
 		if err := usecase.Update(id, userDTO); err != nil {
 			if errors.Is(err, codes.ErrUserNotFound) {
-				return c.JSON(http.StatusNotFound, response.NewNotFoundMessage())
+				return c.JSON(http.StatusNotFound, response.NewNotFound())
 			}
 			log.Println(err.Error())
 			return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
@@ -109,13 +109,13 @@ func Login(usecase *usecases.UserUseCase) echo.HandlerFunc {
 		}
 
 		if err := validator.New().Struct(loginUserDTO); err != nil {
-			return c.JSON(http.StatusBadRequest, response.NewBadRequestMessage(err))
+			return c.JSON(http.StatusBadRequest, response.NewBadRequest(err))
 		}
 
 		user, err := usecase.FindByEmail(loginUserDTO.Email)
 		if err != nil {
 			if errors.Is(err, codes.ErrUserNotFound) {
-				return c.JSON(http.StatusNotFound, response.NewNotFoundMessage())
+				return c.JSON(http.StatusNotFound, response.NewNotFound())
 			}
 			log.Println(err.Error())
 			return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())

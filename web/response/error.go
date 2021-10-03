@@ -23,7 +23,7 @@ func (e *ErrorResponse) SetValidationErrors(err error) {
 	}
 }
 
-func NewBadRequestMessage(err error) ErrorResponse {
+func NewBadRequest(err error) ErrorResponse {
 	var errors []ValidationError
 	res := ErrorResponse{
 		Code:    http.StatusBadRequest,
@@ -34,7 +34,7 @@ func NewBadRequestMessage(err error) ErrorResponse {
 	return res
 }
 
-func NewNotFoundMessage() ErrorResponse {
+func NewNotFound() ErrorResponse {
 	var errors []ValidationError
 	res := ErrorResponse{
 		Code:    http.StatusNotFound,
