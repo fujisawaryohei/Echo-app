@@ -24,7 +24,7 @@ func NewUserUsecase(repo repositories.UserRepository) *UserUseCase {
 func (u *UserUseCase) List() (*[]database.User, error) {
 	users, err := u.userRepository.List()
 	if err != nil {
-		return users, fmt.Errorf("usecases/user.go list err: %s", err)
+		return users, fmt.Errorf("usecases/user.go list err: %w", err)
 	}
 	return users, err
 }
@@ -35,7 +35,7 @@ func (u *UserUseCase) Find(id int) (*database.User, error) {
 		if errors.Is(err, codes.ErrUserNotFound) {
 			return user, codes.ErrUserNotFound
 		}
-		return user, fmt.Errorf("usecases/user.go Find err: %s", err)
+		return user, fmt.Errorf("usecases/user.go Find err: %w", err)
 	}
 	return user, nil
 }
@@ -46,7 +46,7 @@ func (u *UserUseCase) FindByEmail(email string) (*database.User, error) {
 		if errors.Is(err, codes.ErrUserNotFound) {
 			return nil, codes.ErrUserNotFound
 		}
-		return nil, fmt.Errorf("usercases/user.go FindByEmail err: %s", err)
+		return nil, fmt.Errorf("usercases/user.go FindByEmail err: %w", err)
 	}
 	return user, err
 }
@@ -59,7 +59,7 @@ func (u *UserUseCase) Store(userDTO *dto.User) error {
 		if errors.Is(err, codes.ErrUserEmailAlreadyExisted) {
 			return codes.ErrUserEmailAlreadyExisted
 		}
-		return fmt.Errorf("usecases/user.go Store err: %s", err)
+		return fmt.Errorf("usecases/user.go Store err: %w", err)
 	}
 	return nil
 }
@@ -70,14 +70,14 @@ func (u *UserUseCase) Update(id int, userDTO *dto.User) error {
 		if errors.Is(err, codes.ErrUserNotFound) {
 			return codes.ErrUserNotFound
 		}
-		return fmt.Errorf("usecases/user.go Update err: %s", err)
+		return fmt.Errorf("usecases/user.go Update err: %w", err)
 	}
 	return nil
 }
 
 func (u *UserUseCase) Delete(id int) error {
 	if err := u.userRepository.Delete(id); err != nil {
-		return fmt.Errorf("gateway/user.go Delete err: %s", err)
+		return fmt.Errorf("gateway/user.go Delete err: %w", err)
 	}
 	return nil
 }
