@@ -1,9 +1,9 @@
 package web
 
 import (
-	"github.com/fujisawaryohei/echo-app/usecases"
-	"github.com/fujisawaryohei/echo-app/web/auth"
-	"github.com/fujisawaryohei/echo-app/web/handlers"
+	"github.com/fujisawaryohei/blog-server/usecases"
+	"github.com/fujisawaryohei/blog-server/web/auth"
+	"github.com/fujisawaryohei/blog-server/web/handlers"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )

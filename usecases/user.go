@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/fujisawaryohei/echo-app/codes"
-	"github.com/fujisawaryohei/echo-app/database"
-	"github.com/fujisawaryohei/echo-app/domain/entities"
-	"github.com/fujisawaryohei/echo-app/domain/repositories"
-	"github.com/fujisawaryohei/echo-app/web/auth"
-	"github.com/fujisawaryohei/echo-app/web/dto"
-	"github.com/fujisawaryohei/echo-app/web/utils"
+	"github.com/fujisawaryohei/blog-server/codes"
+	"github.com/fujisawaryohei/blog-server/database"
+	"github.com/fujisawaryohei/blog-server/domain/entities"
+	"github.com/fujisawaryohei/blog-server/domain/repositories"
+	"github.com/fujisawaryohei/blog-server/web/auth"
+	"github.com/fujisawaryohei/blog-server/web/dto"
+	"github.com/fujisawaryohei/blog-server/web/utils"
 )
 
 type UserUseCase struct {

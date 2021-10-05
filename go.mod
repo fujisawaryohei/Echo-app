@@ -1,4 +1,4 @@
-module github.com/fujisawaryohei/echo-app
+module github.com/fujisawaryohei/blog-server
 
 go 1.16
 
@@ -6,7 +6,7 @@ require (
 	github.com/bxcodec/faker/v3 v3.6.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-playground/validator/v10 v10.9.0
-	github.com/jackc/pgconn v1.10.0 // indirect
+	github.com/jackc/pgconn v1.10.0
 	github.com/jackc/pgx/v4 v4.13.0 // indirect
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0 // indirect

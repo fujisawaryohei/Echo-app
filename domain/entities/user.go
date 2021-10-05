@@ -1,7 +1,7 @@
 package entities
 
 import (
-	"github.com/fujisawaryohei/echo-app/web/dto"
+	"github.com/fujisawaryohei/blog-server/web/dto"
 )
 
 type User struct {

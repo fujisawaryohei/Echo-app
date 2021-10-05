@@ -3,8 +3,8 @@ package database
 import (
 	"time"
 
-	"github.com/fujisawaryohei/echo-app/web/dto"
-	"github.com/fujisawaryohei/echo-app/web/utils"
+	"github.com/fujisawaryohei/blog-server/web/dto"
+	"github.com/fujisawaryohei/blog-server/web/utils"
 )
 
 type User struct {

@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"github.com/fujisawaryohei/echo-app/database"
-	"github.com/fujisawaryohei/echo-app/web/dto"
+	"github.com/fujisawaryohei/blog-server/database"
+	"github.com/fujisawaryohei/blog-server/web/dto"
 )
 
 type UserRepository interface {

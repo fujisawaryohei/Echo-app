@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/fujisawaryohei/echo-app/database"
-	"github.com/fujisawaryohei/echo-app/database/seeds"
-	"github.com/fujisawaryohei/echo-app/usecases"
-	"github.com/fujisawaryohei/echo-app/web"
-	"github.com/fujisawaryohei/echo-app/web/gateways"
+	"github.com/fujisawaryohei/blog-server/database"
+	"github.com/fujisawaryohei/blog-server/database/seeds"
+	"github.com/fujisawaryohei/blog-server/usecases"
+	"github.com/fujisawaryohei/blog-server/web"
+	"github.com/fujisawaryohei/blog-server/web/gateways"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )

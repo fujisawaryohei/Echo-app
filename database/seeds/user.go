@@ -2,8 +2,8 @@ package seeds
 
 import (
 	"github.com/bxcodec/faker/v3"
-	"github.com/fujisawaryohei/echo-app/database"
-	"github.com/fujisawaryohei/echo-app/web/dto"
+	"github.com/fujisawaryohei/blog-server/database"
+	"github.com/fujisawaryohei/blog-server/web/dto"
 )
 
 func (s Seed) UserSeed() error {

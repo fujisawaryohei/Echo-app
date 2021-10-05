@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/fujisawaryohei/echo-app/codes"
-	"github.com/fujisawaryohei/echo-app/usecases"
-	"github.com/fujisawaryohei/echo-app/web/dto"
-	"github.com/fujisawaryohei/echo-app/web/response"
+	"github.com/fujisawaryohei/blog-server/codes"
+	"github.com/fujisawaryohei/blog-server/usecases"
+	"github.com/fujisawaryohei/blog-server/web/dto"
+	"github.com/fujisawaryohei/blog-server/web/response"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo"
 )
