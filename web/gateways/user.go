@@ -83,6 +83,9 @@ func (repo *UserRepository) Update(id int, userDTO *dto.User) error {
 func (repo *UserRepository) Delete(id int) error {
 	user := new(database.User)
 	if err := repo.dbConn.Delete(user, id).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return codes.ErrUserNotFound
+		}
 		return fmt.Errorf("gateway/user.go Delete err: %w", err)
 	}
 	return nil

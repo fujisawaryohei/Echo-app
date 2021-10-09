@@ -108,6 +108,9 @@ func (u *UserUseCase) Update(id int, userDTO *dto.User) error {
 
 func (u *UserUseCase) Delete(id int) error {
 	if err := u.userRepository.Delete(id); err != nil {
+		if errors.Is(err, codes.ErrUserNotFound) {
+			return codes.ErrUserNotFound
+		}
 		return fmt.Errorf("gateway/user.go Delete err: %w", err)
 	}
 	return nil

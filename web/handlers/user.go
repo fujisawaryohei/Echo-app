@@ -92,8 +92,11 @@ func DeleteUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, _ := strconv.Atoi(c.Param("id"))
 		if err := usecase.Delete(id); err != nil {
+			if errors.Is(err, codes.ErrUserNotFound) {
+				return c.JSON(http.StatusNotFound, response.NewNotFound())
+			}
 			log.Println(err.Error())
-			return c.JSON(http.StatusOK, response.NewInternalServerError())
+			return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
 		}
 		return c.JSON(http.StatusOK, response.NewSuccess())
 	}
@@ -115,7 +118,6 @@ func Login(usecase *usecases.UserUseCase) echo.HandlerFunc {
 			if errors.Is(err, codes.ErrUserNotFound) {
 				return c.JSON(http.StatusNotFound, response.NewNotFound())
 			}
-
 			if errors.Is(err, codes.ErrUserUnAuthorized) {
 				return c.JSON(http.StatusUnauthorized, response.NewUnauthorized())
 			}
