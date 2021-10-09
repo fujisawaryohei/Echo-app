@@ -40,12 +40,12 @@ jobs:
       - name: test
         run: go test ./... -v
 
-  lint:
-    needs: setup
+  staticcheck:
+    name: runner / staticcheck
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v2
+      - uses: reviewdog/action-staticcheck@v1
         with:
-          version: v1.29
+          filter_mode: diff_context
+          fail_on_error: true
