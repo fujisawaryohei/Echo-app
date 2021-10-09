@@ -34,16 +34,6 @@ func NewBadRequest(err error) ErrorResponse {
 	return res
 }
 
-func NewNotFound() ErrorResponse {
-	var errors []ValidationError
-	res := ErrorResponse{
-		Code:    http.StatusNotFound,
-		Message: "Not Found",
-		Errors:  errors,
-	}
-	return res
-}
-
 func NewUnauthorized() ErrorResponse {
 	var errors []ValidationError
 	res := ErrorResponse{
@@ -54,11 +44,11 @@ func NewUnauthorized() ErrorResponse {
 	return res
 }
 
-func NewInternalServerError() ErrorResponse {
+func NewNotFound() ErrorResponse {
 	var errors []ValidationError
 	res := ErrorResponse{
-		Code:    http.StatusInternalServerError,
-		Message: "Internal Server Error",
+		Code:    http.StatusNotFound,
+		Message: "Not Found",
 		Errors:  errors,
 	}
 	return res
@@ -69,6 +59,16 @@ func NewConflic() ErrorResponse {
 	res := ErrorResponse{
 		Code:    http.StatusConflict,
 		Message: "already exists",
+		Errors:  errors,
+	}
+	return res
+}
+
+func NewInternalServerError() ErrorResponse {
+	var errors []ValidationError
+	res := ErrorResponse{
+		Code:    http.StatusInternalServerError,
+		Message: "Internal Server Error",
 		Errors:  errors,
 	}
 	return res
