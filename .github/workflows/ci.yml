@@ -1,6 +1,8 @@
-name: go-ci
-
-on: [push]
+name: blog-server-ci
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   # 共通処理
