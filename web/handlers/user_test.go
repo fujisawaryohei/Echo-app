@@ -66,13 +66,14 @@ func TestUserList(t *testing.T) {
 		mr := mock_repositories.NewMockUserRepository(ctrl)
 		tt.prepareMockFn(mr)
 		userUsecase := usecases.NewUserUsecase(mr)
+		UserHandler := NewUserHandler(userUsecase)
 
 		e := echo.New()
 		req := httptest.NewRequest(http.MethodGet, "/users", nil)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 
-		UserList(userUsecase)(c)
+		UserHandler.List(c)
 		if rec.Code != tt.wantCode {
 			t.Errorf("UserList() code = %d, want = %d", rec.Code, tt.wantCode)
 		}
@@ -126,13 +127,14 @@ func TestFindUser(t *testing.T) {
 		mr := mock_repositories.NewMockUserRepository(ctrl)
 		tt.prepareMockFn(mr)
 		userUsecase := usecases.NewUserUsecase(mr)
+		UserHandler := NewUserHandler(userUsecase)
 
 		e := echo.New()
 		req := httptest.NewRequest(http.MethodGet, "/user/:id", nil)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 
-		FindUser(userUsecase)(c)
+		UserHandler.Find(c)
 		if rec.Code != tt.wantCode {
 			t.Errorf("FindUser() code = %d, want = %d", rec.Code, tt.wantCode)
 		}
@@ -177,6 +179,7 @@ func TestStoreUser(t *testing.T) {
 		mr := mock_repositories.NewMockUserRepository(ctrl)
 		tt.prepareMockFn(mr)
 		userUsecase := usecases.NewUserUsecase(mr)
+		UserHandler := NewUserHandler(userUsecase)
 
 		e := echo.New()
 		req := httptest.NewRequest(http.MethodPost, "/users", strings.NewReader(tt.userJSON))
@@ -184,7 +187,7 @@ func TestStoreUser(t *testing.T) {
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 
-		StoreUser(userUsecase)(c)
+		UserHandler.Store(c)
 		if rec.Code != tt.wantCode {
 			t.Errorf("StoreUser() code = %d, want = %d", rec.Code, tt.wantCode)
 		}
@@ -229,6 +232,7 @@ func TestUpdate(t *testing.T) {
 		mr := mock_repositories.NewMockUserRepository(ctrl)
 		tt.prepareMockFn(mr)
 		userUsecase := usecases.NewUserUsecase(mr)
+		UserHandler := NewUserHandler(userUsecase)
 
 		e := echo.New()
 		req := httptest.NewRequest(http.MethodPatch, "/users/:id", strings.NewReader(tt.userJSON))
@@ -236,7 +240,7 @@ func TestUpdate(t *testing.T) {
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 
-		UpdateUser(userUsecase)(c)
+		UserHandler.Update(c)
 		if rec.Code != tt.wantCode {
 			t.Errorf("UpdateUser() code = %d, want = %d", rec.Code, tt.wantCode)
 		}
@@ -276,6 +280,7 @@ func TestDeleteUser(t *testing.T) {
 		mr := mock_repositories.NewMockUserRepository(ctrl)
 		tt.prepareMockFn(mr)
 		userUsecase := usecases.NewUserUsecase(mr)
+		UserHandler := NewUserHandler(userUsecase)
 
 		e := echo.New()
 		req := httptest.NewRequest(http.MethodDelete, "/users/:id", nil)
@@ -283,7 +288,7 @@ func TestDeleteUser(t *testing.T) {
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 
-		DeleteUser(userUsecase)(c)
+		UserHandler.Delete(c)
 		if rec.Code != tt.wantCode {
 			t.Errorf("DeleteUser() code = %d, want = %d", rec.Code, tt.wantCode)
 		}

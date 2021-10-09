@@ -1,14 +1,13 @@
 package web
 
 import (
-	"github.com/fujisawaryohei/blog-server/usecases"
 	"github.com/fujisawaryohei/blog-server/web/auth"
 	"github.com/fujisawaryohei/blog-server/web/handlers"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
 
-func NewServer(userUseCase *usecases.UserUseCase) {
+func NewServer(userHanlder *handlers.UserHandler) {
 	e := echo.New()
 
 	// アクセスロガー
@@ -20,16 +19,15 @@ func NewServer(userUseCase *usecases.UserUseCase) {
 	}
 
 	// routing
-	e.GET("/", handlers.Index)
-	e.POST("/signup", handlers.StoreUser(userUseCase))
-	e.POST("/login", handlers.Login(userUseCase))
+	e.POST("/signup", userHanlder.Store)
+	e.POST("/login", userHanlder.Login)
 
 	r := e.Group("/users")
 	r.Use(middleware.JWTWithConfig(config))
-	r.GET("", handlers.UserList(userUseCase))
-	r.GET("/:id", handlers.FindUser(userUseCase))
-	r.PATCH("/:id", handlers.UpdateUser(userUseCase))
-	r.DELETE("/:id", handlers.DeleteUser(userUseCase))
+	r.GET("", userHanlder.List)
+	r.GET("/:id", userHanlder.Find)
+	r.PATCH("/:id", userHanlder.Update)
+	r.DELETE("/:id", userHanlder.Delete)
 
 	// サーバー起動
 	e.Logger.Fatal(e.Start(":8080"))

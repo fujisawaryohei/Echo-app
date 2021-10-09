@@ -14,117 +14,115 @@ import (
 	"github.com/labstack/echo"
 )
 
-func UserList(usecase *usecases.UserUseCase) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		users, err := usecase.List()
-		if err != nil {
-			log.Println(err.Error())
-			return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
-		}
-		return c.JSON(http.StatusOK, users)
+type UserHandler struct {
+	usecase *usecases.UserUseCase
+}
+
+func NewUserHandler(usecase *usecases.UserUseCase) *UserHandler {
+	return &UserHandler{
+		usecase: usecase,
 	}
 }
 
-func FindUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		id, _ := strconv.Atoi(c.Param("id"))
-		user, err := usecase.Find(id)
-		if err != nil {
-			if errors.Is(err, codes.ErrUserNotFound) {
-				return c.JSON(http.StatusNotFound, response.NewNotFound())
-			}
-			log.Println(err.Error())
-			return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
-		}
-		return c.JSON(http.StatusOK, user)
+func (h *UserHandler) List(c echo.Context) error {
+	users, err := h.usecase.List()
+	if err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
 	}
+	return c.JSON(http.StatusOK, users)
 }
 
-func StoreUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		userDTO := new(dto.User)
-		if err := c.Bind(userDTO); err != nil {
-			// TODO: いい感じにする
-			return c.JSON(http.StatusBadRequest, "It contains an invalid value")
+func (h *UserHandler) Find(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+	user, err := h.usecase.Find(id)
+	if err != nil {
+		if errors.Is(err, codes.ErrUserNotFound) {
+			return c.JSON(http.StatusNotFound, response.NewNotFound())
 		}
-
-		if err := validator.New().Struct(userDTO); err != nil {
-			return c.JSON(http.StatusBadRequest, response.NewBadRequest(err))
-		}
-
-		signing_token, err := usecase.Store(userDTO)
-		if err != nil {
-			if errors.Is(err, codes.ErrUserEmailAlreadyExisted) {
-				return c.JSON(http.StatusConflict, response.NewConflic())
-			}
-			log.Println(err.Error())
-			return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
-		}
-		return c.JSON(http.StatusCreated, echo.Map{"access_token": signing_token})
+		log.Println(err.Error())
+		return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
 	}
+	return c.JSON(http.StatusOK, user)
 }
 
-func UpdateUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		id, _ := strconv.Atoi(c.Param("id"))
-		userDTO := new(dto.User)
-		if err := c.Bind(userDTO); err != nil {
-			// TODO: いい感じにする
-			return c.JSON(http.StatusBadRequest, "It contains invalid Value")
-		}
-
-		if err := validator.New().Struct(userDTO); err != nil {
-			return c.JSON(http.StatusBadRequest, response.NewBadRequest(err))
-		}
-
-		if err := usecase.Update(id, userDTO); err != nil {
-			if errors.Is(err, codes.ErrUserNotFound) {
-				return c.JSON(http.StatusNotFound, response.NewNotFound())
-			}
-			log.Println(err.Error())
-			return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
-		}
-		return c.JSON(http.StatusOK, response.NewSuccess())
+func (h *UserHandler) Store(c echo.Context) error {
+	userDTO := new(dto.User)
+	if err := c.Bind(userDTO); err != nil {
+		// TODO: いい感じにする
+		return c.JSON(http.StatusBadRequest, "It contains an invalid value")
 	}
+
+	if err := validator.New().Struct(userDTO); err != nil {
+		return c.JSON(http.StatusBadRequest, response.NewBadRequest(err))
+	}
+
+	signing_token, err := h.usecase.Store(userDTO)
+	if err != nil {
+		if errors.Is(err, codes.ErrUserEmailAlreadyExisted) {
+			return c.JSON(http.StatusConflict, response.NewConflic())
+		}
+		log.Println(err.Error())
+		return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
+	}
+	return c.JSON(http.StatusCreated, echo.Map{"access_token": signing_token})
 }
 
-func DeleteUser(usecase *usecases.UserUseCase) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		id, _ := strconv.Atoi(c.Param("id"))
-		if err := usecase.Delete(id); err != nil {
-			if errors.Is(err, codes.ErrUserNotFound) {
-				return c.JSON(http.StatusNotFound, response.NewNotFound())
-			}
-			log.Println(err.Error())
-			return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
-		}
-		return c.JSON(http.StatusOK, response.NewSuccess())
+func (h *UserHandler) Update(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+	userDTO := new(dto.User)
+	if err := c.Bind(userDTO); err != nil {
+		// TODO: いい感じにする
+		return c.JSON(http.StatusBadRequest, "It contains invalid Value")
 	}
+
+	if err := validator.New().Struct(userDTO); err != nil {
+		return c.JSON(http.StatusBadRequest, response.NewBadRequest(err))
+	}
+
+	if err := h.usecase.Update(id, userDTO); err != nil {
+		if errors.Is(err, codes.ErrUserNotFound) {
+			return c.JSON(http.StatusNotFound, response.NewNotFound())
+		}
+		log.Println(err.Error())
+		return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
+	}
+	return c.JSON(http.StatusOK, response.NewSuccess())
 }
 
-func Login(usecase *usecases.UserUseCase) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		loginUserDTO := new(dto.LoginUser)
-		if err := c.Bind(loginUserDTO); err != nil {
-			return c.JSON(http.StatusBadRequest, "It contains invalid Value")
+func (h *UserHandler) Delete(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+	if err := h.usecase.Delete(id); err != nil {
+		if errors.Is(err, codes.ErrUserNotFound) {
+			return c.JSON(http.StatusNotFound, response.NewNotFound())
 		}
-
-		if err := validator.New().Struct(loginUserDTO); err != nil {
-			return c.JSON(http.StatusBadRequest, response.NewBadRequest(err))
-		}
-
-		signing_token, err := usecase.Login(loginUserDTO)
-		if err != nil {
-			if errors.Is(err, codes.ErrUserNotFound) {
-				return c.JSON(http.StatusNotFound, response.NewNotFound())
-			}
-			if errors.Is(err, codes.ErrUserUnAuthorized) {
-				return c.JSON(http.StatusUnauthorized, response.NewUnauthorized())
-			}
-			log.Println(err.Error())
-			return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
-		}
-
-		return c.JSON(http.StatusOK, echo.Map{"access_token": signing_token})
+		log.Println(err.Error())
+		return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
 	}
+	return c.JSON(http.StatusOK, response.NewSuccess())
+}
+
+func (h *UserHandler) Login(c echo.Context) error {
+	loginUserDTO := new(dto.LoginUser)
+	if err := c.Bind(loginUserDTO); err != nil {
+		return c.JSON(http.StatusBadRequest, "It contains invalid Value")
+	}
+
+	if err := validator.New().Struct(loginUserDTO); err != nil {
+		return c.JSON(http.StatusBadRequest, response.NewBadRequest(err))
+	}
+
+	signing_token, err := h.usecase.Login(loginUserDTO)
+	if err != nil {
+		if errors.Is(err, codes.ErrUserNotFound) {
+			return c.JSON(http.StatusNotFound, response.NewNotFound())
+		}
+		if errors.Is(err, codes.ErrUserUnAuthorized) {
+			return c.JSON(http.StatusUnauthorized, response.NewUnauthorized())
+		}
+		log.Println(err.Error())
+		return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{"access_token": signing_token})
 }
