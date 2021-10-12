@@ -75,6 +75,7 @@ func TestUserList(t *testing.T) {
 
 		UserHandler.List(c)
 		if rec.Code != tt.wantCode {
+			t.Errorf("TestCase is %s", tt.name)
 			t.Errorf("UserList() code = %d, want = %d", rec.Code, tt.wantCode)
 		}
 	}
@@ -136,6 +137,7 @@ func TestFindUser(t *testing.T) {
 
 		UserHandler.Find(c)
 		if rec.Code != tt.wantCode {
+			t.Errorf("TestCase is %s", tt.name)
 			t.Errorf("FindUser() code = %d, want = %d", rec.Code, tt.wantCode)
 		}
 	}
@@ -189,6 +191,7 @@ func TestStoreUser(t *testing.T) {
 
 		UserHandler.Store(c)
 		if rec.Code != tt.wantCode {
+			t.Errorf("TestCase is %s", tt.name)
 			t.Errorf("StoreUser() code = %d, want = %d", rec.Code, tt.wantCode)
 		}
 	}
@@ -242,6 +245,7 @@ func TestUpdate(t *testing.T) {
 
 		UserHandler.Update(c)
 		if rec.Code != tt.wantCode {
+			t.Errorf("TestCase is %s", tt.name)
 			t.Errorf("UpdateUser() code = %d, want = %d", rec.Code, tt.wantCode)
 		}
 	}
@@ -290,6 +294,7 @@ func TestDeleteUser(t *testing.T) {
 
 		UserHandler.Delete(c)
 		if rec.Code != tt.wantCode {
+			t.Errorf("TestCase is %s", tt.name)
 			t.Errorf("DeleteUser() code = %d, want = %d", rec.Code, tt.wantCode)
 		}
 	}

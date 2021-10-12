@@ -67,7 +67,7 @@ func (u *UserUseCase) Store(userDTO *dto.User) (string, error) {
 
 	sigining_token, err := auth.GenerateToken(user.Email)
 	if err != nil {
-		return "", codes.ErrInternalServerError
+		return "", fmt.Errorf("usecases/user.go Store err: %w", err)
 	}
 
 	return sigining_token, nil
