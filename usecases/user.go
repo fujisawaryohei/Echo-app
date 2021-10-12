@@ -89,7 +89,7 @@ func (u *UserUseCase) Login(loginUserDTO *dto.LoginUser) (string, error) {
 
 	signing_token, err := auth.GenerateToken(loginUserDTO.Email)
 	if err != nil {
-		return "", codes.ErrInternalServerError
+		return "", fmt.Errorf("usecase/user.go Login err: %w", err)
 	}
 
 	return signing_token, nil

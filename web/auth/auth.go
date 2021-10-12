@@ -1,15 +1,30 @@
 package auth
 
 import (
+	"os"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo"
 )
 
 type JwtCustomClaim struct {
 	Email string `json:"email"`
 	jwt.StandardClaims
+}
+
+func SignKey() ([]byte, error) {
+	secretKey := make([]byte, 10)
+	file, err := os.Open("secret.key")
+	if err != nil {
+		return []byte{}, err
+	}
+	defer file.Close()
+
+	if _, err := file.Read(secretKey); err != nil {
+		return []byte{}, nil
+	}
+	return secretKey, nil
 }
 
 func GenerateToken(email string) (string, error) {
@@ -23,7 +38,12 @@ func GenerateToken(email string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, customClaim)
 
 	// 署名付きトークンを生成
-	signing_token, err := token.SignedString([]byte("secret"))
+	signKey, err := SignKey()
+	if err != nil {
+		return "", err
+	}
+
+	signing_token, err := token.SignedString(signKey)
 	if err != nil {
 		return signing_token, err
 	}

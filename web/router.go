@@ -1,6 +1,8 @@
 package web
 
 import (
+	"log"
+
 	"github.com/fujisawaryohei/blog-server/web/auth"
 	"github.com/fujisawaryohei/blog-server/web/handlers"
 	"github.com/labstack/echo"
@@ -13,9 +15,14 @@ func NewServer(userHanlder *handlers.UserHandler) {
 	// アクセスロガー
 	e.Use(middleware.Logger())
 
+	signKey, err := auth.SignKey()
+	if err != nil {
+		log.Print(err)
+	}
+
 	config := middleware.JWTConfig{
 		Claims:     &auth.JwtCustomClaim{},
-		SigningKey: []byte("secret"),
+		SigningKey: signKey,
 	}
 
 	// routing
