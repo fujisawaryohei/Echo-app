@@ -7,6 +7,7 @@ import (
 	"github.com/fujisawaryohei/blog-server/database/seeds"
 	"github.com/fujisawaryohei/blog-server/usecases"
 	"github.com/fujisawaryohei/blog-server/web"
+	"github.com/fujisawaryohei/blog-server/web/auth"
 	"github.com/fujisawaryohei/blog-server/web/gateways"
 	"github.com/fujisawaryohei/blog-server/web/handlers"
 	"github.com/labstack/echo"
@@ -32,7 +33,8 @@ func main() {
 	if len(commandArgs) == 0 {
 		// UserHandler Init
 		userRepository := gateways.NewUserRepository(db)
-		userUseCase := usecases.NewUserUsecase(userRepository)
+		authenticator := auth.NewAuthenticator()
+		userUseCase := usecases.NewUserUsecase(userRepository, authenticator)
 		userHandler := handlers.NewUserHandler(userUseCase)
 
 		// サーバー起動

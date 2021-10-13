@@ -12,6 +12,7 @@ import (
 	"github.com/fujisawaryohei/blog-server/database"
 	mock_repositories "github.com/fujisawaryohei/blog-server/domain/mock-repositories"
 	"github.com/fujisawaryohei/blog-server/usecases"
+	"github.com/fujisawaryohei/blog-server/web/auth"
 	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo"
 )
@@ -38,14 +39,15 @@ func TestUserList(t *testing.T) {
 		},
 	}
 	tests := []struct {
-		name          string
-		prepareMockFn func(mock *mock_repositories.MockUserRepository)
-		users         *[]database.User
-		wantCode      int
+		name                    string
+		prepareRepositoryMockFn func(mock *mock_repositories.MockUserRepository)
+		prepareAuthMockFn       func(mock *auth.MockIAuthenticator)
+		users                   *[]database.User
+		wantCode                int
 	}{
 		{
 			name: "ユーザー一覧を返す",
-			prepareMockFn: func(mock *mock_repositories.MockUserRepository) {
+			prepareRepositoryMockFn: func(mock *mock_repositories.MockUserRepository) {
 				mock.EXPECT().List().Return(storedUsers, nil)
 			},
 			users:    storedUsers,
@@ -53,7 +55,7 @@ func TestUserList(t *testing.T) {
 		},
 		{
 			name: "internal server error",
-			prepareMockFn: func(mock *mock_repositories.MockUserRepository) {
+			prepareRepositoryMockFn: func(mock *mock_repositories.MockUserRepository) {
 				mock.EXPECT().List().Return(&[]database.User{}, errors.New("internal server error"))
 			},
 			users:    &[]database.User{},
@@ -64,8 +66,9 @@ func TestUserList(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mr := mock_repositories.NewMockUserRepository(ctrl)
-		tt.prepareMockFn(mr)
-		userUsecase := usecases.NewUserUsecase(mr)
+		tt.prepareRepositoryMockFn(mr)
+		authenticator := auth.NewAuthenticator()
+		userUsecase := usecases.NewUserUsecase(mr, authenticator)
 		UserHandler := NewUserHandler(userUsecase)
 
 		e := echo.New()
@@ -127,7 +130,8 @@ func TestFindUser(t *testing.T) {
 		defer ctrl.Finish()
 		mr := mock_repositories.NewMockUserRepository(ctrl)
 		tt.prepareMockFn(mr)
-		userUsecase := usecases.NewUserUsecase(mr)
+		authenticator := auth.NewAuthenticator()
+		userUsecase := usecases.NewUserUsecase(mr, authenticator)
 		UserHandler := NewUserHandler(userUsecase)
 
 		e := echo.New()
@@ -145,22 +149,26 @@ func TestFindUser(t *testing.T) {
 
 func TestStoreUser(t *testing.T) {
 	tests := []struct {
-		name          string
-		prepareMockFn func(mock *mock_repositories.MockUserRepository)
-		userJSON      string
-		wantCode      int
+		name                    string
+		prepareRepositoryMockFn func(mock *mock_repositories.MockUserRepository)
+		prepareAuthMockFn       func(mock *auth.MockIAuthenticator)
+		userJSON                string
+		wantCode                int
 	}{
 		{
 			name: "ユーザーを作成する",
-			prepareMockFn: func(mock *mock_repositories.MockUserRepository) {
+			prepareRepositoryMockFn: func(mock *mock_repositories.MockUserRepository) {
 				mock.EXPECT().Save(gomock.Any()).Return(nil)
+			},
+			prepareAuthMockFn: func(mock *auth.MockIAuthenticator) {
+				mock.EXPECT().GenerateToken(gomock.Any()).Return("secret", nil)
 			},
 			userJSON: `{"name": "test", "email":"test@example.com", "password": "password", "password_confirmation": "password" }`,
 			wantCode: http.StatusCreated,
 		},
 		{
 			name: "email has already existed",
-			prepareMockFn: func(mock *mock_repositories.MockUserRepository) {
+			prepareRepositoryMockFn: func(mock *mock_repositories.MockUserRepository) {
 				mock.EXPECT().Save(gomock.Any()).Return(codes.ErrUserEmailAlreadyExisted)
 			},
 			userJSON: `{"name": "test", "email":"test@example.com", "password": "password", "password_confirmation": "password" }`,
@@ -168,7 +176,7 @@ func TestStoreUser(t *testing.T) {
 		},
 		{
 			name: "internal server error",
-			prepareMockFn: func(mock *mock_repositories.MockUserRepository) {
+			prepareRepositoryMockFn: func(mock *mock_repositories.MockUserRepository) {
 				mock.EXPECT().Save(gomock.Any()).Return(codes.ErrInternalServerError)
 			},
 			userJSON: `{"name": "test", "email":"test@example.com", "password": "password", "password_confirmation": "password" }`,
@@ -176,11 +184,20 @@ func TestStoreUser(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		var userUsecase *usecases.UserUseCase
+
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mr := mock_repositories.NewMockUserRepository(ctrl)
-		tt.prepareMockFn(mr)
-		userUsecase := usecases.NewUserUsecase(mr)
+		ma := auth.NewMockIAuthenticator(ctrl)
+		tt.prepareRepositoryMockFn(mr)
+		if tt.prepareAuthMockFn != nil {
+			tt.prepareAuthMockFn(ma)
+			userUsecase = usecases.NewUserUsecase(mr, ma)
+		} else {
+			authenticator := auth.NewAuthenticator()
+			userUsecase = usecases.NewUserUsecase(mr, authenticator)
+		}
 		UserHandler := NewUserHandler(userUsecase)
 
 		e := echo.New()
@@ -234,7 +251,8 @@ func TestUpdate(t *testing.T) {
 		defer ctrl.Finish()
 		mr := mock_repositories.NewMockUserRepository(ctrl)
 		tt.prepareMockFn(mr)
-		userUsecase := usecases.NewUserUsecase(mr)
+		authenticator := auth.NewAuthenticator()
+		userUsecase := usecases.NewUserUsecase(mr, authenticator)
 		UserHandler := NewUserHandler(userUsecase)
 
 		e := echo.New()
@@ -283,7 +301,8 @@ func TestDeleteUser(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		mr := mock_repositories.NewMockUserRepository(ctrl)
 		tt.prepareMockFn(mr)
-		userUsecase := usecases.NewUserUsecase(mr)
+		authenticator := auth.NewAuthenticator()
+		userUsecase := usecases.NewUserUsecase(mr, authenticator)
 		UserHandler := NewUserHandler(userUsecase)
 
 		e := echo.New()

@@ -16,11 +16,13 @@ import (
 
 type UserUseCase struct {
 	userRepository repositories.UserRepository
+	authenticator  auth.IAuthenticator
 }
 
-func NewUserUsecase(repo repositories.UserRepository) *UserUseCase {
+func NewUserUsecase(repo repositories.UserRepository, authenticator auth.IAuthenticator) *UserUseCase {
 	return &UserUseCase{
 		userRepository: repo,
+		authenticator:  authenticator,
 	}
 }
 
@@ -65,8 +67,9 @@ func (u *UserUseCase) Store(userDTO *dto.User) (string, error) {
 		return "", fmt.Errorf("usecases/user.go Store err: %w", err)
 	}
 
-	sigining_token, err := auth.GenerateToken(user.Email)
+	sigining_token, err := u.authenticator.GenerateToken(user.Email)
 	if err != nil {
+		fmt.Print("----------------")
 		return "", fmt.Errorf("usecases/user.go Store err: %w", err)
 	}
 
@@ -87,7 +90,7 @@ func (u *UserUseCase) Login(loginUserDTO *dto.LoginUser) (string, error) {
 		return "", codes.ErrUserUnAuthorized
 	}
 
-	signing_token, err := auth.GenerateToken(loginUserDTO.Email)
+	signing_token, err := u.authenticator.GenerateToken(loginUserDTO.Email)
 	if err != nil {
 		return "", fmt.Errorf("usecase/user.go Login err: %w", err)
 	}

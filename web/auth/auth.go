@@ -8,9 +8,47 @@ import (
 	"github.com/labstack/echo"
 )
 
+type IAuthenticator interface {
+	GenerateToken(email string) (string, error)
+}
+
+type Authenticator struct {
+	JwtCustomClaim
+}
+
 type JwtCustomClaim struct {
 	Email string `json:"email"`
 	jwt.StandardClaims
+}
+
+func NewAuthenticator() *Authenticator {
+	return &Authenticator{
+		JwtCustomClaim: JwtCustomClaim{
+			Email: "",
+			StandardClaims: jwt.StandardClaims{
+				IssuedAt:  time.Now().Unix(),
+				ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
+			},
+		},
+	}
+}
+
+func (a *Authenticator) GenerateToken(email string) (string, error) {
+	a.JwtCustomClaim.Email = email
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, a.JwtCustomClaim)
+
+	// 署名付きトークンを生成
+	signKey, err := SignKey()
+	if err != nil {
+		return "", err
+	}
+
+	signing_token, err := token.SignedString(signKey)
+	if err != nil {
+		return signing_token, err
+	}
+
+	return signing_token, nil
 }
 
 func SignKey() ([]byte, error) {
@@ -25,30 +63,6 @@ func SignKey() ([]byte, error) {
 		return []byte{}, nil
 	}
 	return secretKey, nil
-}
-
-func GenerateToken(email string) (string, error) {
-	customClaim := &JwtCustomClaim{
-		Email: email,
-		StandardClaims: jwt.StandardClaims{
-			IssuedAt:  time.Now().Unix(),
-			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
-		},
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, customClaim)
-
-	// 署名付きトークンを生成
-	signKey, err := SignKey()
-	if err != nil {
-		return "", err
-	}
-
-	signing_token, err := token.SignedString(signKey)
-	if err != nil {
-		return signing_token, err
-	}
-
-	return signing_token, nil
 }
 
 func CurrentUserEmail(c echo.Context) interface{} {
