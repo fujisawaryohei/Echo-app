@@ -1,19 +1,19 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE users (
+CREATE TABLE post_tags (
     id SERIAL NOT NULL,
-    name VARCHAR(50) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    password VARCHAR(60) NOT NULL,
-    password_confirmation VARCHAR(60) NOT NULL,
+    post_id INTEGER NOT NULL,
+    tag_id INTEGER NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(id),
-    UNIQUE(email)
+    FOREIGN KEY(post_id) REFERENCES posts(id),
+    FOREIGN KEY(tag_id) REFERENCES tags(id)
 );
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS post_tags;
 -- +goose StatementEnd
+
