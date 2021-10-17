@@ -10,7 +10,7 @@ import (
 
 	"github.com/fujisawaryohei/blog-server/codes"
 	"github.com/fujisawaryohei/blog-server/database"
-	mock_repositories "github.com/fujisawaryohei/blog-server/domain/mock-repositories"
+	mock_repositories "github.com/fujisawaryohei/blog-server/domain/users"
 	"github.com/fujisawaryohei/blog-server/usecases"
 	"github.com/fujisawaryohei/blog-server/web/auth"
 	"github.com/golang/mock/gomock"

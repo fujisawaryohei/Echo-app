@@ -7,19 +7,18 @@ import (
 
 	"github.com/fujisawaryohei/blog-server/codes"
 	"github.com/fujisawaryohei/blog-server/database"
-	"github.com/fujisawaryohei/blog-server/domain/entities"
-	"github.com/fujisawaryohei/blog-server/domain/repositories"
+	"github.com/fujisawaryohei/blog-server/domain/users"
 	"github.com/fujisawaryohei/blog-server/web/auth"
 	"github.com/fujisawaryohei/blog-server/web/dto"
 	"github.com/fujisawaryohei/blog-server/web/utils"
 )
 
 type UserUseCase struct {
-	userRepository repositories.UserRepository
+	userRepository users.UserRepository
 	authenticator  auth.IAuthenticator
 }
 
-func NewUserUsecase(repo repositories.UserRepository, authenticator auth.IAuthenticator) *UserUseCase {
+func NewUserUsecase(repo users.UserRepository, authenticator auth.IAuthenticator) *UserUseCase {
 	return &UserUseCase{
 		userRepository: repo,
 		authenticator:  authenticator,
@@ -59,7 +58,7 @@ func (u *UserUseCase) FindByEmail(email string) (*database.User, error) {
 // 原則レイヤ間のデータのやり取りはDTOを使用する。
 // アプリケーション固有のロジックが発生した場合は、ドメインモデルを呼び出して処理してDTOに変換して別レイヤに渡す流れを取る。
 func (u *UserUseCase) Store(userDTO *dto.User) (string, error) {
-	user := entities.NewUser(userDTO.Name, userDTO.Email, userDTO.Password, userDTO.PasswordConfirmation)
+	user := users.NewUser(userDTO.Name, userDTO.Email, userDTO.Password, userDTO.PasswordConfirmation)
 	if err := u.userRepository.Save(user.ConvertToDTO()); err != nil {
 		if errors.Is(err, codes.ErrUserEmailAlreadyExisted) {
 			return "", codes.ErrUserEmailAlreadyExisted
@@ -69,7 +68,6 @@ func (u *UserUseCase) Store(userDTO *dto.User) (string, error) {
 
 	sigining_token, err := u.authenticator.GenerateToken(user.Email)
 	if err != nil {
-		fmt.Print("----------------")
 		return "", fmt.Errorf("usecases/user.go Store err: %w", err)
 	}
 
@@ -99,7 +97,7 @@ func (u *UserUseCase) Login(loginUserDTO *dto.LoginUser) (string, error) {
 }
 
 func (u *UserUseCase) Update(id int, userDTO *dto.User) error {
-	user := entities.NewUser(userDTO.Name, userDTO.Email, userDTO.Password, userDTO.PasswordConfirmation)
+	user := users.NewUser(userDTO.Name, userDTO.Email, userDTO.Password, userDTO.PasswordConfirmation)
 	if err := u.userRepository.Update(id, user.ConvertToDTO()); err != nil {
 		if errors.Is(err, codes.ErrUserNotFound) {
 			return codes.ErrUserNotFound
