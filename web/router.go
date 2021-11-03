@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/middleware"
 )
 
-func NewServer(userHanlder *handlers.UserHandler) {
+func NewServer(userHanlder *handlers.UserHandler, postHandler *handlers.PostHandler) {
 	e := echo.New()
 
 	// アクセスロガー
@@ -29,12 +29,16 @@ func NewServer(userHanlder *handlers.UserHandler) {
 	e.POST("/signup", userHanlder.Store)
 	e.POST("/login", userHanlder.Login)
 
-	r := e.Group("/users")
-	r.Use(middleware.JWTWithConfig(config))
-	r.GET("", userHanlder.List)
-	r.GET("/:id", userHanlder.Find)
-	r.PATCH("/:id", userHanlder.Update)
-	r.DELETE("/:id", userHanlder.Delete)
+	users := e.Group("/users")
+	users.Use(middleware.JWTWithConfig(config))
+	users.GET("", userHanlder.List)
+	users.GET("/:id", userHanlder.Find)
+	users.PATCH("/:id", userHanlder.Update)
+	users.DELETE("/:id", userHanlder.Delete)
+
+	posts := e.Group("/posts")
+	posts.Use(middleware.JWTWithConfig(config))
+	posts.GET("", postHandler.List)
 
 	// サーバー起動
 	e.Logger.Fatal(e.Start(":8080"))

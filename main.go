@@ -37,7 +37,12 @@ func main() {
 		userUseCase := usecases.NewUserUsecase(userRepository, authenticator)
 		userHandler := handlers.NewUserHandler(userUseCase)
 
+		// PostHandler Init
+		postRepository := gateways.NewPostRepository(db)
+		postUseCase := usecases.NewPostUsecase(postRepository)
+		postHandler := handlers.NewPostHanlder(postUseCase)
+
 		// サーバー起動
-		web.NewServer(userHandler)
+		web.NewServer(userHandler, postHandler)
 	}
 }
