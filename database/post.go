@@ -7,9 +7,9 @@ import (
 )
 
 type Post struct {
-	ID        int `grom:"primaryKey"`
+	ID        int `gorm:"primaryKey"`
 	Title     string
-	Body      string
+	Body      string `gorm:"type:text"`
 	Published bool
 	CreatedAt time.Time
 	UpdatedAt time.Time

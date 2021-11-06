@@ -18,4 +18,6 @@ var (
 	ErrUserEmailTooShort       = errors.New("email is too short")
 	ErrPasswordRequired        = errors.New("password is required")
 	ErrPasswordNotMatched      = errors.New("password_confirmation is not matched password")
+
+	ErrPostNotFound = errors.New("post not found")
 )
