@@ -8,6 +8,7 @@ import (
 
 	"github.com/fujisawaryohei/blog-server/codes"
 	"github.com/fujisawaryohei/blog-server/usecases"
+	"github.com/fujisawaryohei/blog-server/web/dto"
 	"github.com/fujisawaryohei/blog-server/web/response"
 	"github.com/labstack/echo"
 )
@@ -41,4 +42,16 @@ func (h *PostHandler) Find(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
 	}
 	return c.JSON(http.StatusOK, post)
+}
+
+func (h *PostHandler) Store(c echo.Context) error {
+	postDTO := new(dto.Post)
+	if err := c.Bind(postDTO); err != nil {
+		return c.JSON(http.StatusBadRequest, response.NewBadRequest)
+	}
+
+	if err := h.usecase.Store(postDTO); err != nil {
+		return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
+	}
+	return c.JSON(http.StatusAccepted, nil)
 }
