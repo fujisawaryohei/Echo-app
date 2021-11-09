@@ -58,7 +58,7 @@ func (u *UserUseCase) FindByEmail(email string) (*database.User, error) {
 // 原則レイヤ間のデータのやり取りはDTOを使用する。
 // アプリケーション固有のロジックが発生した場合は、ドメインモデルを呼び出して処理してDTOに変換して別レイヤに渡す流れを取る。
 func (u *UserUseCase) Store(userDTO *dto.User) (string, error) {
-	user := users.NewUser(userDTO.Name, userDTO.Email, userDTO.Password, userDTO.PasswordConfirmation)
+	user, errorArr := users.NewUser(userDTO.Name, userDTO.Email, userDTO.Password, userDTO.PasswordConfirmation)
 	if err := u.userRepository.Save(user.ConvertToDTO()); err != nil {
 		if errors.Is(err, codes.ErrUserEmailAlreadyExisted) {
 			return "", codes.ErrUserEmailAlreadyExisted
