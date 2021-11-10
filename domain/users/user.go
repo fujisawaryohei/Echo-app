@@ -13,7 +13,7 @@ type User struct {
 }
 
 // TODO: refactor https://stackoverflow.com/questions/43336009/constructor-with-many-arguments
-func NewUser(name string, email string, password string, passwordConfirmation string) (*User, []error) {
+func NewUser(name string, email string, password string, passwordConfirmation string) (*User, []*codes.ValidationError) {
 	user := &User{
 		Name:                 name,
 		Email:                email,
@@ -21,11 +21,12 @@ func NewUser(name string, email string, password string, passwordConfirmation st
 		PasswordConfirmation: passwordConfirmation,
 	}
 
-	if user.IsValid() {
-		return user, nil
+	ValidationErrors := user.IsValid()
+	if len(ValidationErrors) != 0 {
+		return nil, ValidationErrors
 	}
 
-	return nil, user.Errors()
+	return user, nil
 }
 
 func (u *User) ConvertToDTO() *dto.User {
@@ -37,24 +38,17 @@ func (u *User) ConvertToDTO() *dto.User {
 	}
 }
 
-func (u *User) IsValid() bool {
-	var errors []error
-	if u.Password == u.PasswordConfirmation {
-		errors = append(errors, codes.ErrPasswordNotMatched)
+func (u *User) IsValid() []*codes.ValidationError {
+	var validationErrors []*codes.ValidationError
+	if err := u.PassowrdMatched(); err != nil {
+		validationErrors = append(validationErrors, err)
 	}
-
-	if len(errors) == 0 {
-		return false
-	}
-
-	return true
+	return validationErrors
 }
 
-func (u *User) Errors() []error {
-	var errors []error
-
+func (u *User) PassowrdMatched() *codes.ValidationError {
 	if u.Password == u.PasswordConfirmation {
-		errors = append(errors, codes.ErrPasswordNotMatched)
+		return nil
 	}
-	return errors
+	return &codes.ValidationError{FieldName: "password", Message: codes.ErrPasswordNotMatched.Error()}
 }

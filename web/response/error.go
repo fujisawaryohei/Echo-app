@@ -3,39 +3,52 @@ package response
 import (
 	"net/http"
 
+	"github.com/fujisawaryohei/blog-server/codes"
 	"github.com/go-playground/validator/v10"
 )
 
 type ErrorResponse struct {
-	Code    int               `json:"code"`
-	Message string            `json:"message"`
-	Errors  []ValidationError `json:"errors"`
+	Code    int                     `json:"code"`
+	Message string                  `json:"message"`
+	Errors  []codes.ValidationError `json:"errors"`
 }
 
-type ValidationError struct {
-	Field   string `json:"field"`
-	Message string `json:"message"`
-}
-
-func (e *ErrorResponse) SetValidationErrors(err error) {
+func (e *ErrorResponse) SetFormValidationErrors(err error) {
 	for _, err := range err.(validator.ValidationErrors) {
-		e.Errors = append(e.Errors, ValidationError{Field: err.Field(), Message: err.Error()})
+		e.Errors = append(e.Errors, codes.ValidationError{FieldName: err.Field(), Message: err.Error()})
+	}
+}
+
+func (e *ErrorResponse) SetValidationErrors(errors []*codes.ValidationError) {
+	for _, err := range errors {
+		e.Errors = append(e.Errors, codes.ValidationError{FieldName: err.Field(), Message: err.Error()})
 	}
 }
 
 func NewBadRequest(err error) ErrorResponse {
-	var errors []ValidationError
+	var errors []codes.ValidationError
 	res := ErrorResponse{
 		Code:    http.StatusBadRequest,
 		Message: "Bad Request",
 		Errors:  errors,
 	}
-	res.SetValidationErrors(err)
+	res.SetFormValidationErrors(err)
+	return res
+}
+
+func NewValidationErrorBadRequest(validationErrors []*codes.ValidationError) ErrorResponse {
+	var errors []codes.ValidationError
+	res := ErrorResponse{
+		Code:    http.StatusBadRequest,
+		Message: "Bad Request",
+		Errors:  errors,
+	}
+	res.SetValidationErrors(validationErrors)
 	return res
 }
 
 func NewUnauthorized() ErrorResponse {
-	var errors []ValidationError
+	var errors []codes.ValidationError
 	res := ErrorResponse{
 		Code:    http.StatusUnauthorized,
 		Message: "unauthorized",
@@ -45,7 +58,7 @@ func NewUnauthorized() ErrorResponse {
 }
 
 func NewNotFound() ErrorResponse {
-	var errors []ValidationError
+	var errors []codes.ValidationError
 	res := ErrorResponse{
 		Code:    http.StatusNotFound,
 		Message: "Not Found",
@@ -55,7 +68,7 @@ func NewNotFound() ErrorResponse {
 }
 
 func NewConflic() ErrorResponse {
-	var errors []ValidationError
+	var errors []codes.ValidationError
 	res := ErrorResponse{
 		Code:    http.StatusConflict,
 		Message: "already exists",
@@ -65,7 +78,7 @@ func NewConflic() ErrorResponse {
 }
 
 func NewInternalServerError() ErrorResponse {
-	var errors []ValidationError
+	var errors []codes.ValidationError
 	res := ErrorResponse{
 		Code:    http.StatusInternalServerError,
 		Message: "Internal Server Error",

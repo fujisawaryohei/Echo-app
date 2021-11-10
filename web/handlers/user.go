@@ -57,7 +57,11 @@ func (h *UserHandler) Store(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response.NewBadRequest(err))
 	}
 
-	signing_token, err := h.usecase.Store(userDTO)
+	signing_token, validationErrors, err := h.usecase.Store(userDTO)
+	if len(validationErrors) != 0 {
+		return c.JSON(http.StatusBadRequest, response.NewValidationErrorBadRequest(validationErrors))
+	}
+
 	if err != nil {
 		if errors.Is(err, codes.ErrUserEmailAlreadyExisted) {
 			return c.JSON(http.StatusConflict, response.NewConflic())
@@ -80,7 +84,12 @@ func (h *UserHandler) Update(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response.NewBadRequest(err))
 	}
 
-	if err := h.usecase.Update(id, userDTO); err != nil {
+	validationErrors, err := h.usecase.Update(id, userDTO)
+	if len(validationErrors) != 0 {
+		return c.JSON(http.StatusBadRequest, response.NewValidationErrorBadRequest(validationErrors))
+	}
+
+	if err != nil {
 		if errors.Is(err, codes.ErrUserNotFound) {
 			return c.JSON(http.StatusNotFound, response.NewNotFound())
 		}
