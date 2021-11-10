@@ -1,6 +1,8 @@
 package codes
 
-import "errors"
+import (
+	"errors"
+)
 
 var (
 	// 500系エラー
@@ -18,4 +20,19 @@ var (
 	ErrUserEmailTooShort       = errors.New("email is too short")
 	ErrPasswordRequired        = errors.New("password is required")
 	ErrPasswordNotMatched      = errors.New("password_confirmation is not matched password")
+
+	ErrPostNotFound = errors.New("post not found")
 )
+
+type ValidationError struct {
+	FieldName string `json:"field"`
+	Message   string `json:"message"`
+}
+
+func (v *ValidationError) Error() string {
+	return v.Message
+}
+
+func (v *ValidationError) Field() string {
+	return v.FieldName
+}

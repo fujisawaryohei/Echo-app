@@ -57,21 +57,25 @@ func (u *UserUseCase) FindByEmail(email string) (*database.User, error) {
 
 // 原則レイヤ間のデータのやり取りはDTOを使用する。
 // アプリケーション固有のロジックが発生した場合は、ドメインモデルを呼び出して処理してDTOに変換して別レイヤに渡す流れを取る。
-func (u *UserUseCase) Store(userDTO *dto.User) (string, error) {
-	user := users.NewUser(userDTO.Name, userDTO.Email, userDTO.Password, userDTO.PasswordConfirmation)
+func (u *UserUseCase) Store(userDTO *dto.User) (string, []*codes.ValidationError, error) {
+	user, validationErrors := users.NewUser(userDTO.Name, userDTO.Email, userDTO.Password, userDTO.PasswordConfirmation)
+	if len(validationErrors) != 0 {
+		return "", validationErrors, nil
+	}
+
 	if err := u.userRepository.Save(user.ConvertToDTO()); err != nil {
 		if errors.Is(err, codes.ErrUserEmailAlreadyExisted) {
-			return "", codes.ErrUserEmailAlreadyExisted
+			return "", nil, codes.ErrUserEmailAlreadyExisted
 		}
-		return "", fmt.Errorf("usecases/user.go Store err: %w", err)
+		return "", nil, fmt.Errorf("usecases/user.go Store err: %w", err)
 	}
 
 	sigining_token, err := u.authenticator.GenerateToken(user.Email)
 	if err != nil {
-		return "", fmt.Errorf("usecases/user.go Store err: %w", err)
+		return "", nil, fmt.Errorf("usecases/user.go Store err: %w", err)
 	}
 
-	return sigining_token, nil
+	return sigining_token, nil, nil
 }
 
 func (u *UserUseCase) Login(loginUserDTO *dto.LoginUser) (string, error) {
@@ -96,15 +100,19 @@ func (u *UserUseCase) Login(loginUserDTO *dto.LoginUser) (string, error) {
 	return signing_token, nil
 }
 
-func (u *UserUseCase) Update(id int, userDTO *dto.User) error {
-	user := users.NewUser(userDTO.Name, userDTO.Email, userDTO.Password, userDTO.PasswordConfirmation)
+func (u *UserUseCase) Update(id int, userDTO *dto.User) ([]*codes.ValidationError, error) {
+	user, validationErrors := users.NewUser(userDTO.Name, userDTO.Email, userDTO.Password, userDTO.PasswordConfirmation)
+	if len(validationErrors) != 0 {
+		return validationErrors, nil
+	}
+
 	if err := u.userRepository.Update(id, user.ConvertToDTO()); err != nil {
 		if errors.Is(err, codes.ErrUserNotFound) {
-			return codes.ErrUserNotFound
+			return nil, codes.ErrUserNotFound
 		}
-		return fmt.Errorf("usecases/user.go Update err: %w", err)
+		return nil, fmt.Errorf("usecases/user.go Update err: %w", err)
 	}
-	return nil
+	return nil, nil
 }
 
 func (u *UserUseCase) Delete(id int) error {

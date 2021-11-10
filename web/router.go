@@ -39,6 +39,8 @@ func NewServer(userHanlder *handlers.UserHandler, postHandler *handlers.PostHand
 	posts := e.Group("/posts")
 	posts.Use(middleware.JWTWithConfig(config))
 	posts.GET("", postHandler.List)
+	posts.GET("/:id", postHandler.Find)
+	posts.POST("", postHandler.Store)
 
 	// サーバー起動
 	e.Logger.Fatal(e.Start(":8080"))

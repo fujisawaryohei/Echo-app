@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// TODO: ドメインモデルに変換して返す
 type UserRepository struct {
 	dbConn *gorm.DB
 }
