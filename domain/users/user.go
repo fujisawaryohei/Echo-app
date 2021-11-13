@@ -36,6 +36,10 @@ func (u *User) IsValid() bool {
 	if err := u.Email.ValidFormat(); err != nil {
 		return false
 	}
+
+	if err := u.Email.Duplicated(); err != nil {
+		return false
+	}
 	return true
 }
 
@@ -46,6 +50,10 @@ func (u *User) ValidationErrors() []*codes.ValidationError {
 	}
 
 	if err := u.Email.ValidFormat(); err != nil {
+		validationErrors = append(validationErrors, err)
+	}
+
+	if err := u.Email.Duplicated(); err != nil {
 		validationErrors = append(validationErrors, err)
 	}
 	return validationErrors

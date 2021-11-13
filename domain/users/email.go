@@ -8,10 +8,14 @@ import (
 
 type Email struct {
 	Address string
+	Service *EmailService
 }
 
-func NewEmail(address string) *Email {
-	email := &Email{Address: address}
+func NewEmail(address string, service *EmailService) *Email {
+	email := &Email{
+		Address: address,
+		Service: service,
+	}
 	return email
 }
 
@@ -22,4 +26,11 @@ func (e *Email) ValidFormat() *codes.ValidationError {
 		return nil
 	}
 	return &codes.ValidationError{FieldName: "email", Message: codes.ErrUserEmailInvalidFormat.Error()}
+}
+
+func (e *Email) Duplicated() *codes.ValidationError {
+	if !e.Service.Duplicated(e.Address) {
+		return nil
+	}
+	return &codes.ValidationError{FieldName: "email", Message: codes.ErrUserEmailAlreadyExisted.Error()}
 }

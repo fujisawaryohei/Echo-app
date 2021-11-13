@@ -58,7 +58,8 @@ func (u *UserUseCase) FindByEmail(email string) (*database.User, error) {
 // 原則レイヤ間のデータのやり取りはDTOを使用する。
 // アプリケーション固有のロジックが発生した場合は、ドメインモデルを呼び出して処理してDTOに変換して別レイヤに渡す流れを取る。
 func (u *UserUseCase) Store(userDTO *dto.User) (string, []*codes.ValidationError, error) {
-	email := users.NewEmail(userDTO.Email)
+	emailService := users.NewEmailService(u.userRepository)
+	email := users.NewEmail(userDTO.Email, emailService)
 	user, validationErrors := users.NewUser(userDTO.Name, email, userDTO.Password, userDTO.PasswordConfirmation)
 	if len(validationErrors) != 0 {
 		return "", validationErrors, nil
@@ -102,7 +103,8 @@ func (u *UserUseCase) Login(loginUserDTO *dto.LoginUser) (string, error) {
 }
 
 func (u *UserUseCase) Update(id int, userDTO *dto.User) ([]*codes.ValidationError, error) {
-	email := users.NewEmail(userDTO.Email)
+	emailService := users.NewEmailService(u.userRepository)
+	email := users.NewEmail(userDTO.Email, emailService)
 	user, validationErrors := users.NewUser(userDTO.Name, email, userDTO.Password, userDTO.PasswordConfirmation)
 	if len(validationErrors) != 0 {
 		return validationErrors, nil
