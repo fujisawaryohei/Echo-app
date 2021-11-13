@@ -7,13 +7,13 @@ import (
 
 type User struct {
 	Name                 string
-	Email                string
+	Email                *Email
 	Password             string
 	PasswordConfirmation string
 }
 
 // TODO: refactor https://stackoverflow.com/questions/43336009/constructor-with-many-arguments
-func NewUser(name string, email string, password string, passwordConfirmation string) (*User, []*codes.ValidationError) {
+func NewUser(name string, email *Email, password string, passwordConfirmation string) (*User, []*codes.ValidationError) {
 	user := &User{
 		Name:                 name,
 		Email:                email,
@@ -21,26 +21,31 @@ func NewUser(name string, email string, password string, passwordConfirmation st
 		PasswordConfirmation: passwordConfirmation,
 	}
 
-	ValidationErrors := user.IsValid()
-	if len(ValidationErrors) != 0 {
-		return nil, ValidationErrors
+	if !user.IsValid() {
+		return nil, user.ValidationErrors()
 	}
 
 	return user, nil
 }
 
-func (u *User) ConvertToDTO() *dto.User {
-	return &dto.User{
-		Name:                 u.Name,
-		Email:                u.Email,
-		Password:             u.Password,
-		PasswordConfirmation: u.PasswordConfirmation,
+func (u *User) IsValid() bool {
+	if err := u.PassowrdMatched(); err != nil {
+		return false
 	}
+
+	if err := u.Email.ValidFormat(); err != nil {
+		return false
+	}
+	return true
 }
 
-func (u *User) IsValid() []*codes.ValidationError {
+func (u *User) ValidationErrors() []*codes.ValidationError {
 	var validationErrors []*codes.ValidationError
 	if err := u.PassowrdMatched(); err != nil {
+		validationErrors = append(validationErrors, err)
+	}
+
+	if err := u.Email.ValidFormat(); err != nil {
 		validationErrors = append(validationErrors, err)
 	}
 	return validationErrors
@@ -51,4 +56,13 @@ func (u *User) PassowrdMatched() *codes.ValidationError {
 		return nil
 	}
 	return &codes.ValidationError{FieldName: "password", Message: codes.ErrPasswordNotMatched.Error()}
+}
+
+func (u *User) ConvertToDTO() *dto.User {
+	return &dto.User{
+		Name:                 u.Name,
+		Email:                u.Email.Address,
+		Password:             u.Password,
+		PasswordConfirmation: u.PasswordConfirmation,
+	}
 }
