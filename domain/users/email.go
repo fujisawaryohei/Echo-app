@@ -20,8 +20,8 @@ func NewEmail(address string, service *EmailService) *Email {
 }
 
 func (e *Email) ValidFormat() *codes.ValidationError {
-	pattern := `^(?i:[^ @"<>]+|".*")@(?i:[a-z1-9.])+.(?i:[a-z])+$`
-	email_regexp := regexp.MustCompile(pattern)
+	ADDRESS_PATTERN := `^(?i:[^ @"<>]+|".*")@(?i:[a-z1-9.])+.(?i:[a-z])+$`
+	email_regexp := regexp.MustCompile(ADDRESS_PATTERN)
 	if len(email_regexp.FindAllString(e.Address, -1)) != 0 {
 		return nil
 	}

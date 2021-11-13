@@ -58,9 +58,9 @@ func (u *UserUseCase) FindByEmail(email string) (*database.User, error) {
 // 原則レイヤ間のデータのやり取りはDTOを使用する。
 // アプリケーション固有のロジックが発生した場合は、ドメインモデルを呼び出して処理してDTOに変換して別レイヤに渡す流れを取る。
 func (u *UserUseCase) Store(userDTO *dto.User) (string, []*codes.ValidationError, error) {
-	emailService := users.NewEmailService(u.userRepository)
-	email := users.NewEmail(userDTO.Email, emailService)
-	user, validationErrors := users.NewUser(userDTO.Name, email, userDTO.Password, userDTO.PasswordConfirmation)
+	userFactory := users.NewUserFactory(u.userRepository)
+	user, validationErrors := userFactory.Create(userDTO)
+
 	if len(validationErrors) != 0 {
 		return "", validationErrors, nil
 	}
@@ -76,7 +76,6 @@ func (u *UserUseCase) Store(userDTO *dto.User) (string, []*codes.ValidationError
 	if err != nil {
 		return "", nil, fmt.Errorf("usecases/user.go Store err: %w", err)
 	}
-
 	return sigining_token, nil, nil
 }
 
@@ -98,14 +97,13 @@ func (u *UserUseCase) Login(loginUserDTO *dto.LoginUser) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("usecase/user.go Login err: %w", err)
 	}
-
 	return signing_token, nil
 }
 
 func (u *UserUseCase) Update(id int, userDTO *dto.User) ([]*codes.ValidationError, error) {
-	emailService := users.NewEmailService(u.userRepository)
-	email := users.NewEmail(userDTO.Email, emailService)
-	user, validationErrors := users.NewUser(userDTO.Name, email, userDTO.Password, userDTO.PasswordConfirmation)
+	userFactory := users.NewUserFactory(u.userRepository)
+	user, validationErrors := userFactory.Create(userDTO)
+
 	if len(validationErrors) != 0 {
 		return validationErrors, nil
 	}
