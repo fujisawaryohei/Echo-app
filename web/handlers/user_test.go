@@ -39,15 +39,15 @@ func TestUserList(t *testing.T) {
 		},
 	}
 	tests := []struct {
-		name                    string
-		prepareRepositoryMockFn func(mock *mock_repositories.MockUserRepository)
-		prepareAuthMockFn       func(mock *auth.MockIAuthenticator)
-		users                   *[]database.User
-		wantCode                int
+		name              string
+		prepareListMock   func(mock *mock_repositories.MockUserRepository)
+		prepareAuthMockFn func(mock *auth.MockIAuthenticator)
+		users             *[]database.User
+		wantCode          int
 	}{
 		{
 			name: "ユーザー一覧を返す",
-			prepareRepositoryMockFn: func(mock *mock_repositories.MockUserRepository) {
+			prepareListMock: func(mock *mock_repositories.MockUserRepository) {
 				mock.EXPECT().List().Return(storedUsers, nil)
 			},
 			users:    storedUsers,
@@ -55,7 +55,7 @@ func TestUserList(t *testing.T) {
 		},
 		{
 			name: "internal server error",
-			prepareRepositoryMockFn: func(mock *mock_repositories.MockUserRepository) {
+			prepareListMock: func(mock *mock_repositories.MockUserRepository) {
 				mock.EXPECT().List().Return(&[]database.User{}, errors.New("internal server error"))
 			},
 			users:    &[]database.User{},
@@ -66,7 +66,7 @@ func TestUserList(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mr := mock_repositories.NewMockUserRepository(ctrl)
-		tt.prepareRepositoryMockFn(mr)
+		tt.prepareListMock(mr)
 		authenticator := auth.NewAuthenticator()
 		userUsecase := usecases.NewUserUsecase(mr, authenticator)
 		UserHandler := NewUserHandler(userUsecase)
@@ -95,14 +95,14 @@ func TestFindUser(t *testing.T) {
 		UpdatedAt:            time.Now(),
 	}
 	tests := []struct {
-		name          string
-		prepareMockFn func(mock *mock_repositories.MockUserRepository)
-		user          *database.User
-		wantCode      int
+		name            string
+		prepareFindMock func(mock *mock_repositories.MockUserRepository)
+		user            *database.User
+		wantCode        int
 	}{
 		{
 			name: "ユーザー情報を返す",
-			prepareMockFn: func(mock *mock_repositories.MockUserRepository) {
+			prepareFindMock: func(mock *mock_repositories.MockUserRepository) {
 				mock.EXPECT().FindById(gomock.Any()).Return(storedUser, nil)
 			},
 			user:     storedUser,
@@ -110,7 +110,7 @@ func TestFindUser(t *testing.T) {
 		},
 		{
 			name: "not found error",
-			prepareMockFn: func(mock *mock_repositories.MockUserRepository) {
+			prepareFindMock: func(mock *mock_repositories.MockUserRepository) {
 				mock.EXPECT().FindById(gomock.Any()).Return(&database.User{}, codes.ErrUserNotFound)
 			},
 			user:     &database.User{},
@@ -118,7 +118,7 @@ func TestFindUser(t *testing.T) {
 		},
 		{
 			name: "internal server error",
-			prepareMockFn: func(mock *mock_repositories.MockUserRepository) {
+			prepareFindMock: func(mock *mock_repositories.MockUserRepository) {
 				mock.EXPECT().FindById(gomock.Any()).Return(&database.User{}, errors.New("internal server error"))
 			},
 			user:     &database.User{},
@@ -129,7 +129,7 @@ func TestFindUser(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mr := mock_repositories.NewMockUserRepository(ctrl)
-		tt.prepareMockFn(mr)
+		tt.prepareFindMock(mr)
 		authenticator := auth.NewAuthenticator()
 		userUsecase := usecases.NewUserUsecase(mr, authenticator)
 		UserHandler := NewUserHandler(userUsecase)
@@ -148,36 +148,52 @@ func TestFindUser(t *testing.T) {
 }
 
 func TestStoreUser(t *testing.T) {
+	storedUser := &database.User{
+		ID:                   1,
+		Name:                 "test",
+		Email:                "test@example.com",
+		Password:             "password",
+		PasswordConfirmation: "password",
+		CreatedAt:            time.Now(),
+		UpdatedAt:            time.Now(),
+	}
 	tests := []struct {
-		name                    string
-		prepareRepositoryMockFn func(mock *mock_repositories.MockUserRepository)
-		prepareAuthMockFn       func(mock *auth.MockIAuthenticator)
-		userJSON                string
-		wantCode                int
+		name                   string
+		prepareStoreMock       func(mock *mock_repositories.MockUserRepository)
+		prepareFindByEmailMock func(mock *mock_repositories.MockUserRepository)
+		prepareAuthMock        func(mock *auth.MockIAuthenticator)
+		userJSON               string
+		wantCode               int
 	}{
 		{
 			name: "ユーザーを作成する",
-			prepareRepositoryMockFn: func(mock *mock_repositories.MockUserRepository) {
+			prepareStoreMock: func(mock *mock_repositories.MockUserRepository) {
 				mock.EXPECT().Save(gomock.Any()).Return(nil)
 			},
-			prepareAuthMockFn: func(mock *auth.MockIAuthenticator) {
+			prepareFindByEmailMock: func(mock *mock_repositories.MockUserRepository) {
+				mock.EXPECT().FindByEmail(gomock.Any()).Return(nil, codes.ErrUserNotFound)
+			},
+			prepareAuthMock: func(mock *auth.MockIAuthenticator) {
 				mock.EXPECT().GenerateToken(gomock.Any()).Return("secret", nil)
 			},
-			userJSON: `{"name": "test", "email":"test@example.com", "password": "password", "password_confirmation": "password" }`,
+			userJSON: `{"name": "test", "email":"test1@example.com", "password": "password", "password_confirmation": "password" }`,
 			wantCode: http.StatusCreated,
 		},
 		{
 			name: "email has already existed",
-			prepareRepositoryMockFn: func(mock *mock_repositories.MockUserRepository) {
-				mock.EXPECT().Save(gomock.Any()).Return(codes.ErrUserEmailAlreadyExisted)
+			prepareFindByEmailMock: func(mock *mock_repositories.MockUserRepository) {
+				mock.EXPECT().FindByEmail(gomock.Any()).Return(storedUser, nil).AnyTimes()
 			},
 			userJSON: `{"name": "test", "email":"test@example.com", "password": "password", "password_confirmation": "password" }`,
-			wantCode: http.StatusConflict,
+			wantCode: http.StatusBadRequest,
 		},
 		{
 			name: "internal server error",
-			prepareRepositoryMockFn: func(mock *mock_repositories.MockUserRepository) {
+			prepareStoreMock: func(mock *mock_repositories.MockUserRepository) {
 				mock.EXPECT().Save(gomock.Any()).Return(codes.ErrInternalServerError)
+			},
+			prepareFindByEmailMock: func(mock *mock_repositories.MockUserRepository) {
+				mock.EXPECT().FindByEmail(gomock.Any()).Return(nil, codes.ErrUserNotFound)
 			},
 			userJSON: `{"name": "test", "email":"test@example.com", "password": "password", "password_confirmation": "password" }`,
 			wantCode: http.StatusInternalServerError,
@@ -190,16 +206,25 @@ func TestStoreUser(t *testing.T) {
 		defer ctrl.Finish()
 		mr := mock_repositories.NewMockUserRepository(ctrl)
 		ma := auth.NewMockIAuthenticator(ctrl)
-		tt.prepareRepositoryMockFn(mr)
-		if tt.prepareAuthMockFn != nil {
-			tt.prepareAuthMockFn(ma)
+
+		// メールアドレスの入力値検証の失敗のテストケースはFindByEmailのみをモックする
+		if tt.name == "email has already existed" {
+			tt.prepareFindByEmailMock(mr)
+		} else {
+			tt.prepareStoreMock(mr)
+			tt.prepareFindByEmailMock(mr)
+		}
+
+		// ユーザーを作成するテストケースではAuthをモックする
+		if tt.name == "ユーザーを作成する" {
+			tt.prepareAuthMock(ma)
 			userUsecase = usecases.NewUserUsecase(mr, ma)
 		} else {
 			authenticator := auth.NewAuthenticator()
 			userUsecase = usecases.NewUserUsecase(mr, authenticator)
 		}
-		UserHandler := NewUserHandler(userUsecase)
 
+		UserHandler := NewUserHandler(userUsecase)
 		e := echo.New()
 		req := httptest.NewRequest(http.MethodPost, "/users", strings.NewReader(tt.userJSON))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -215,32 +240,59 @@ func TestStoreUser(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
+	storedUser := &database.User{
+		ID:                   1,
+		Name:                 "test",
+		Email:                "test@example.com",
+		Password:             "password",
+		PasswordConfirmation: "password",
+		CreatedAt:            time.Now(),
+		UpdatedAt:            time.Now(),
+	}
 	tests := []struct {
-		name          string
-		prepareMockFn func(mock *mock_repositories.MockUserRepository)
-		userJSON      string
-		wantCode      int
+		name                   string
+		prepareUpdateMock      func(mock *mock_repositories.MockUserRepository)
+		prepareFindByEmailMock func(mock *mock_repositories.MockUserRepository)
+		userJSON               string
+		wantCode               int
 	}{
 		{
 			name: "ユーザー情報を更新する",
-			prepareMockFn: func(mock *mock_repositories.MockUserRepository) {
+			prepareUpdateMock: func(mock *mock_repositories.MockUserRepository) {
 				mock.EXPECT().Update(gomock.Any(), gomock.Any()).Return(nil)
 			},
-			userJSON: `{"name": "test", "email":"test@example.com", "password": "password", "password_confirmation": "password" }`,
+			prepareFindByEmailMock: func(mock *mock_repositories.MockUserRepository) {
+				mock.EXPECT().FindByEmail(gomock.Any()).Return(nil, codes.ErrUserNotFound)
+			},
+			userJSON: `{"name": "test", "email":"test1@example.com", "password": "password", "password_confirmation": "password" }`,
 			wantCode: http.StatusOK,
 		},
 		{
+			name: "email has already existed",
+			prepareFindByEmailMock: func(mock *mock_repositories.MockUserRepository) {
+				mock.EXPECT().FindByEmail(gomock.Any()).Return(storedUser, nil).AnyTimes()
+			},
+			userJSON: `{"name": "test", "email":"test@example.com", "password": "password", "password_confirmation": "password" }`,
+			wantCode: http.StatusBadRequest,
+		},
+		{
 			name: "not found error",
-			prepareMockFn: func(mock *mock_repositories.MockUserRepository) {
+			prepareUpdateMock: func(mock *mock_repositories.MockUserRepository) {
 				mock.EXPECT().Update(gomock.Any(), gomock.Any()).Return(codes.ErrUserNotFound)
+			},
+			prepareFindByEmailMock: func(mock *mock_repositories.MockUserRepository) {
+				mock.EXPECT().FindByEmail(gomock.Any()).Return(nil, codes.ErrUserNotFound)
 			},
 			userJSON: `{"name": "test", "email":"test@example.com", "password": "password", "password_confirmation": "password" }`,
 			wantCode: http.StatusNotFound,
 		},
 		{
 			name: "internal server error",
-			prepareMockFn: func(mock *mock_repositories.MockUserRepository) {
+			prepareUpdateMock: func(mock *mock_repositories.MockUserRepository) {
 				mock.EXPECT().Update(gomock.Any(), gomock.Any()).Return(codes.ErrInternalServerError)
+			},
+			prepareFindByEmailMock: func(mock *mock_repositories.MockUserRepository) {
+				mock.EXPECT().FindByEmail(gomock.Any()).Return(nil, codes.ErrUserNotFound)
 			},
 			userJSON: `{"name": "test", "email":"test@example.com", "password": "password", "password_confirmation": "password" }`,
 			wantCode: http.StatusInternalServerError,
@@ -250,7 +302,15 @@ func TestUpdate(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mr := mock_repositories.NewMockUserRepository(ctrl)
-		tt.prepareMockFn(mr)
+
+		// メールアドレスの入力値検証の失敗のテストケースはFindByEmailのみをモックする
+		if tt.name == "email has already existed" {
+			tt.prepareFindByEmailMock(mr)
+		} else {
+			tt.prepareUpdateMock(mr)
+			tt.prepareFindByEmailMock(mr)
+		}
+
 		authenticator := auth.NewAuthenticator()
 		userUsecase := usecases.NewUserUsecase(mr, authenticator)
 		UserHandler := NewUserHandler(userUsecase)
@@ -271,27 +331,27 @@ func TestUpdate(t *testing.T) {
 
 func TestDeleteUser(t *testing.T) {
 	tests := []struct {
-		name          string
-		prepareMockFn func(mock *mock_repositories.MockUserRepository)
-		wantCode      int
+		name              string
+		prepareDeleteMock func(mock *mock_repositories.MockUserRepository)
+		wantCode          int
 	}{
 		{
 			name: "ユーザーを削除する",
-			prepareMockFn: func(mock *mock_repositories.MockUserRepository) {
+			prepareDeleteMock: func(mock *mock_repositories.MockUserRepository) {
 				mock.EXPECT().Delete(gomock.Any()).Return(nil)
 			},
 			wantCode: http.StatusOK,
 		},
 		{
 			name: "not found error",
-			prepareMockFn: func(mock *mock_repositories.MockUserRepository) {
+			prepareDeleteMock: func(mock *mock_repositories.MockUserRepository) {
 				mock.EXPECT().Delete(gomock.Any()).Return(codes.ErrUserNotFound)
 			},
 			wantCode: http.StatusNotFound,
 		},
 		{
 			name: "internal server error",
-			prepareMockFn: func(mock *mock_repositories.MockUserRepository) {
+			prepareDeleteMock: func(mock *mock_repositories.MockUserRepository) {
 				mock.EXPECT().Delete(gomock.Any()).Return(codes.ErrInternalServerError)
 			},
 			wantCode: http.StatusInternalServerError,
@@ -300,7 +360,7 @@ func TestDeleteUser(t *testing.T) {
 	for _, tt := range tests {
 		ctrl := gomock.NewController(t)
 		mr := mock_repositories.NewMockUserRepository(ctrl)
-		tt.prepareMockFn(mr)
+		tt.prepareDeleteMock(mr)
 		authenticator := auth.NewAuthenticator()
 		userUsecase := usecases.NewUserUsecase(mr, authenticator)
 		UserHandler := NewUserHandler(userUsecase)
