@@ -10,8 +10,8 @@ type EmailService struct {
 	UserRepository
 }
 
-func NewEmailService(userRepository UserRepository) *EmailService {
-	return &EmailService{
+func NewEmailService(userRepository UserRepository) EmailService {
+	return EmailService{
 		UserRepository: userRepository,
 	}
 }

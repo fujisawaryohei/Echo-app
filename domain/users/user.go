@@ -7,13 +7,13 @@ import (
 
 type User struct {
 	Name                 string
-	Email                *Email
+	Email                Email
 	Password             string
 	PasswordConfirmation string
 }
 
 // TODO: refactor https://stackoverflow.com/questions/43336009/constructor-with-many-arguments
-func NewUser(name string, email *Email, password string, passwordConfirmation string) (*User, []*codes.ValidationError) {
+func NewUser(name string, email Email, password string, passwordConfirmation string) (*User, []*codes.ValidationError) {
 	user := &User{
 		Name:                 name,
 		Email:                email,

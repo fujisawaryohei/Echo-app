@@ -9,8 +9,8 @@ type UserFactory struct {
 	UserRepository
 }
 
-func NewUserFactory(userRepository UserRepository) *UserFactory {
-	return &UserFactory{
+func NewUserFactory(userRepository UserRepository) UserFactory {
+	return UserFactory{
 		UserRepository: userRepository,
 	}
 }

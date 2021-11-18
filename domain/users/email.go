@@ -8,10 +8,10 @@ import (
 
 type Email struct {
 	Address string
-	Service *EmailService
+	Service EmailService
 }
 
-func NewEmail(address string, service *EmailService) *Email {
+func NewEmail(address string, service EmailService) *Email {
 	email := &Email{
 		Address: address,
 		Service: service,
