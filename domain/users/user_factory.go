@@ -18,7 +18,8 @@ func NewUserFactory(userRepository UserRepository) UserFactory {
 func (uf *UserFactory) Create(userDTO *dto.User) (*User, []*codes.ValidationError) {
 	emailService := NewEmailService(uf.UserRepository)
 	email := NewEmail(userDTO.Email, emailService)
-	user, validationErrors := NewUser(userDTO.Name, email, userDTO.Password, userDTO.PasswordConfirmation)
+	password := NewPassword(userDTO.Password, userDTO.PasswordConfirmation)
+	user, validationErrors := NewUser(userDTO.Name, email, password)
 
 	if len(validationErrors) != 0 {
 		return nil, validationErrors

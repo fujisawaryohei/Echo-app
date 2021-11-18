@@ -6,19 +6,17 @@ import (
 )
 
 type User struct {
-	Name                 string
-	Email                Email
-	Password             string
-	PasswordConfirmation string
+	Name     string
+	Email    Email
+	Password Password
 }
 
 // TODO: refactor https://stackoverflow.com/questions/43336009/constructor-with-many-arguments
-func NewUser(name string, email Email, password string, passwordConfirmation string) (*User, []*codes.ValidationError) {
+func NewUser(name string, email Email, password Password) (*User, []*codes.ValidationError) {
 	user := &User{
-		Name:                 name,
-		Email:                email,
-		Password:             password,
-		PasswordConfirmation: passwordConfirmation,
+		Name:     name,
+		Email:    email,
+		Password: password,
 	}
 
 	if !user.IsValid() {
@@ -29,7 +27,7 @@ func NewUser(name string, email Email, password string, passwordConfirmation str
 }
 
 func (u *User) IsValid() bool {
-	if err := u.PassowrdMatched(); err != nil {
+	if err := u.Password.PassowrdMatched(); err != nil {
 		return false
 	}
 
@@ -45,7 +43,7 @@ func (u *User) IsValid() bool {
 
 func (u *User) ValidationErrors() []*codes.ValidationError {
 	var validationErrors []*codes.ValidationError
-	if err := u.PassowrdMatched(); err != nil {
+	if err := u.Password.PassowrdMatched(); err != nil {
 		validationErrors = append(validationErrors, err)
 	}
 
@@ -59,18 +57,11 @@ func (u *User) ValidationErrors() []*codes.ValidationError {
 	return validationErrors
 }
 
-func (u *User) PassowrdMatched() *codes.ValidationError {
-	if u.Password == u.PasswordConfirmation {
-		return nil
-	}
-	return &codes.ValidationError{FieldName: "password", Message: codes.ErrPasswordNotMatched.Error()}
-}
-
 func (u *User) ConvertToDTO() *dto.User {
 	return &dto.User{
 		Name:                 u.Name,
 		Email:                u.Email.Address,
-		Password:             u.Password,
-		PasswordConfirmation: u.PasswordConfirmation,
+		Password:             u.Password.Password,
+		PasswordConfirmation: u.Password.PasswordConfirmation,
 	}
 }

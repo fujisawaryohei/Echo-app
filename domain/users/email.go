@@ -11,8 +11,8 @@ type Email struct {
 	Service EmailService
 }
 
-func NewEmail(address string, service EmailService) *Email {
-	email := &Email{
+func NewEmail(address string, service EmailService) Email {
+	email := Email{
 		Address: address,
 		Service: service,
 	}
