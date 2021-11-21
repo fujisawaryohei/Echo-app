@@ -69,7 +69,7 @@ func (h *UserHandler) Store(c echo.Context) error {
 		log.Println(err.Error())
 		return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
 	}
-	return c.JSON(http.StatusCreated, echo.Map{"access_token": signing_token})
+	return c.JSON(http.StatusOK, echo.Map{"access_token": signing_token})
 }
 
 func (h *UserHandler) Update(c echo.Context) error {
@@ -96,7 +96,7 @@ func (h *UserHandler) Update(c echo.Context) error {
 		log.Println(err.Error())
 		return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
 	}
-	return c.JSON(http.StatusOK, response.NewSuccess())
+	return c.JSON(http.StatusAccepted, nil)
 }
 
 func (h *UserHandler) Delete(c echo.Context) error {
@@ -108,7 +108,7 @@ func (h *UserHandler) Delete(c echo.Context) error {
 		log.Println(err.Error())
 		return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
 	}
-	return c.JSON(http.StatusOK, response.NewSuccess())
+	return c.JSON(http.StatusAccepted, nil)
 }
 
 func (h *UserHandler) Login(c echo.Context) error {

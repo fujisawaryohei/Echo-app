@@ -41,6 +41,7 @@ func NewServer(userHanlder *handlers.UserHandler, postHandler *handlers.PostHand
 	posts.GET("", postHandler.List)
 	posts.GET("/:id", postHandler.Find)
 	posts.POST("", postHandler.Store)
+	posts.PATCH("/:id", postHandler.Update)
 
 	// サーバー起動
 	e.Logger.Fatal(e.Start(":8080"))

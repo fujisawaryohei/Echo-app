@@ -10,7 +10,7 @@ type Post struct {
 	ID        int `gorm:"primaryKey"`
 	Title     string
 	Body      string `gorm:"type:text"`
-	Published bool
+	Published *bool
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

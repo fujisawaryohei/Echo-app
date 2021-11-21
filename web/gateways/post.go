@@ -47,3 +47,19 @@ func (repo *PostRepository) Store(postDTO *dto.Post) error {
 	}
 	return nil
 }
+
+func (repo *PostRepository) Update(id int, postDTO *dto.Post) error {
+	post, err := repo.FindById(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return codes.ErrPostNotFound
+		}
+		return fmt.Errorf("gateay/post.go Update err: %w", err)
+	}
+
+	newPost := database.ConvertToPost(postDTO)
+	if err := repo.dbConn.Model(post).Updates(newPost).Error; err != nil {
+		return fmt.Errorf("gateway/post.go Update err: %w", err)
+	}
+	return nil
+}

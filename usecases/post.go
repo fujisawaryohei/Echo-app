@@ -45,3 +45,10 @@ func (u *PostUsecase) Store(postDTO *dto.Post) error {
 	}
 	return nil
 }
+
+func (u *PostUsecase) Update(id int, postDTO *dto.Post) error {
+	if err := u.postRepository.Update(id, postDTO); err != nil {
+		return fmt.Errorf("usecases/post.go Store err: %w", err)
+	}
+	return nil
+}
