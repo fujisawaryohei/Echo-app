@@ -63,3 +63,14 @@ func (repo *PostRepository) Update(id int, postDTO *dto.Post) error {
 	}
 	return nil
 }
+
+func (repo *PostRepository) Delete(id int) error {
+	post := new(database.Post)
+	if err := repo.dbConn.Delete(post, id).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return codes.ErrPostNotFound
+		}
+		return fmt.Errorf("gateway/post.go Delete err: %w", err)
+	}
+	return nil
+}

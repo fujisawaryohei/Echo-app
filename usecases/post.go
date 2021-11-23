@@ -48,7 +48,20 @@ func (u *PostUsecase) Store(postDTO *dto.Post) error {
 
 func (u *PostUsecase) Update(id int, postDTO *dto.Post) error {
 	if err := u.postRepository.Update(id, postDTO); err != nil {
-		return fmt.Errorf("usecases/post.go Store err: %w", err)
+		if errors.Is(err, codes.ErrPostNotFound) {
+			return codes.ErrPostNotFound
+		}
+		return fmt.Errorf("usecases/post.go Update err: %w", err)
+	}
+	return nil
+}
+
+func (u *PostUsecase) Delete(id int) error {
+	if err := u.postRepository.Delete(id); err != nil {
+		if errors.Is(err, codes.ErrPostNotFound) {
+			return codes.ErrPostNotFound
+		}
+		return fmt.Errorf("usecase/post.go Delete err: %w", err)
 	}
 	return nil
 }

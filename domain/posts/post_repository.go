@@ -10,4 +10,5 @@ type PostRepository interface {
 	FindById(id int) (*database.Post, error)
 	Store(post *dto.Post) error
 	Update(id int, postDTO *dto.Post) error
+	Delete(id int) error
 }

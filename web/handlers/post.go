@@ -81,3 +81,14 @@ func (h *PostHandler) Update(c echo.Context) error {
 	}
 	return c.JSON(http.StatusAccepted, nil)
 }
+
+func (h *PostHandler) Delete(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+	if err := h.usecase.Delete(id); err != nil {
+		if errors.Is(err, codes.ErrPostNotFound) {
+			return c.JSON(http.StatusNotFound, response.NewNotFound())
+		}
+		return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
+	}
+	return c.JSON(http.StatusAccepted, nil)
+}
