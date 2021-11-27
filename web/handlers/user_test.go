@@ -72,7 +72,7 @@ func TestUserList(t *testing.T) {
 		UserHandler := NewUserHandler(userUsecase)
 
 		e := echo.New()
-		req := httptest.NewRequest(http.MethodGet, "/users", nil)
+		req := httptest.NewRequest(http.MethodGet, "/admin/users", nil)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 
@@ -135,7 +135,7 @@ func TestFindUser(t *testing.T) {
 		UserHandler := NewUserHandler(userUsecase)
 
 		e := echo.New()
-		req := httptest.NewRequest(http.MethodGet, "/user/:id", nil)
+		req := httptest.NewRequest(http.MethodGet, "/admin/users/:id", nil)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 
@@ -177,7 +177,7 @@ func TestStoreUser(t *testing.T) {
 				mock.EXPECT().GenerateToken(gomock.Any()).Return("secret", nil)
 			},
 			userJSON: `{"name": "test", "email":"test1@example.com", "password": "password", "password_confirmation": "password" }`,
-			wantCode: http.StatusCreated,
+			wantCode: http.StatusOK,
 		},
 		{
 			name: "email has already existed",
@@ -226,7 +226,7 @@ func TestStoreUser(t *testing.T) {
 
 		UserHandler := NewUserHandler(userUsecase)
 		e := echo.New()
-		req := httptest.NewRequest(http.MethodPost, "/users", strings.NewReader(tt.userJSON))
+		req := httptest.NewRequest(http.MethodPost, "/admin/users", strings.NewReader(tt.userJSON))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
@@ -265,7 +265,7 @@ func TestUpdate(t *testing.T) {
 				mock.EXPECT().FindByEmail(gomock.Any()).Return(nil, codes.ErrUserNotFound)
 			},
 			userJSON: `{"name": "test", "email":"test1@example.com", "password": "password", "password_confirmation": "password" }`,
-			wantCode: http.StatusOK,
+			wantCode: http.StatusAccepted,
 		},
 		{
 			name: "email has already existed",
@@ -316,7 +316,7 @@ func TestUpdate(t *testing.T) {
 		UserHandler := NewUserHandler(userUsecase)
 
 		e := echo.New()
-		req := httptest.NewRequest(http.MethodPatch, "/users/:id", strings.NewReader(tt.userJSON))
+		req := httptest.NewRequest(http.MethodPatch, "/admin/users/:id", strings.NewReader(tt.userJSON))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
@@ -340,7 +340,7 @@ func TestDeleteUser(t *testing.T) {
 			prepareDeleteMock: func(mock *mock_repositories.MockUserRepository) {
 				mock.EXPECT().Delete(gomock.Any()).Return(nil)
 			},
-			wantCode: http.StatusOK,
+			wantCode: http.StatusAccepted,
 		},
 		{
 			name: "not found error",
@@ -366,7 +366,7 @@ func TestDeleteUser(t *testing.T) {
 		UserHandler := NewUserHandler(userUsecase)
 
 		e := echo.New()
-		req := httptest.NewRequest(http.MethodDelete, "/users/:id", nil)
+		req := httptest.NewRequest(http.MethodDelete, "/admin/users/:id", nil)
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
