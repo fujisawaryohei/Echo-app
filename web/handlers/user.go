@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/fujisawaryohei/blog-server/codes"
+	"github.com/fujisawaryohei/blog-server/presenters"
 	"github.com/fujisawaryohei/blog-server/usecases"
 	"github.com/fujisawaryohei/blog-server/web/dto"
 	"github.com/fujisawaryohei/blog-server/web/response"
@@ -30,7 +31,8 @@ func (h *UserHandler) List(c echo.Context) error {
 		log.Println(err.Error())
 		return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
 	}
-	return c.JSON(http.StatusOK, users)
+
+	return c.JSON(http.StatusOK, presenters.FormatUsers(users))
 }
 
 func (h *UserHandler) Find(c echo.Context) error {
@@ -43,7 +45,8 @@ func (h *UserHandler) Find(c echo.Context) error {
 		log.Println(err.Error())
 		return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
 	}
-	return c.JSON(http.StatusOK, user)
+
+	return c.JSON(http.StatusOK, presenters.FormatUser(user))
 }
 
 func (h *UserHandler) Store(c echo.Context) error {
