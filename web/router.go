@@ -26,8 +26,8 @@ func NewServer(userHanlder *handlers.UserHandler, postHandler *handlers.PostHand
 	}
 
 	// routing
-	e.POST("/signup", userHanlder.Store)
-	e.POST("/login", userHanlder.Login)
+	e.POST("/admin/signup", userHanlder.Store)
+	e.POST("/admin/login", userHanlder.Login)
 
 	admin := e.Group("/admin")
 	admin.Use(middleware.JWTWithConfig(config))
