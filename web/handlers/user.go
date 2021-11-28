@@ -32,7 +32,7 @@ func (h *UserHandler) List(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
 	}
 
-	return c.JSON(http.StatusOK, presenters.FormatUsers(users))
+	return c.JSON(http.StatusOK, presenters.CreateUsersViewModel(users))
 }
 
 func (h *UserHandler) Find(c echo.Context) error {
@@ -46,7 +46,7 @@ func (h *UserHandler) Find(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response.NewInternalServerError())
 	}
 
-	return c.JSON(http.StatusOK, presenters.FormatUser(user))
+	return c.JSON(http.StatusOK, presenters.CreateUserViewModel(user))
 }
 
 func (h *UserHandler) Store(c echo.Context) error {

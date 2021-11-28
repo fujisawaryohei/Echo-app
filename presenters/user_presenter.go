@@ -7,7 +7,7 @@ import (
 	viewmodel "github.com/fujisawaryohei/blog-server/presenters/viewModel"
 )
 
-func FormatUser(user *database.User) viewmodel.User {
+func CreateUserViewModel(user *database.User) viewmodel.User {
 	return viewmodel.User{
 		Id:        user.ID,
 		Name:      user.Name,
@@ -17,7 +17,7 @@ func FormatUser(user *database.User) viewmodel.User {
 	}
 }
 
-func FormatUsers(users *[]database.User) []viewmodel.User {
+func CreateUsersViewModel(users *[]database.User) []viewmodel.User {
 	var userViewModels []viewmodel.User
 	for _, user := range *users {
 		userViewModels = append(userViewModels, viewmodel.User{
