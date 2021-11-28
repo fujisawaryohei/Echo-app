@@ -38,6 +38,7 @@ func NewServer(userHanlder *handlers.UserHandler, postHandler *handlers.PostHand
 	admin.POST("/posts", postHandler.Store)
 	admin.PATCH("/posts/:id", postHandler.Update)
 	admin.DELETE("/posts/:id", postHandler.Delete)
+
 	e.GET("/posts", postHandler.List)
 	e.GET("/posts/:id", postHandler.Find)
 

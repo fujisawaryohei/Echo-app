@@ -1,4 +1,4 @@
-package gateways
+package persistences
 
 import (
 	"errors"
@@ -12,17 +12,17 @@ import (
 )
 
 // TODO: ドメインモデルに変換して返す
-type UserRepository struct {
+type UserPersistence struct {
 	dbConn *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) *UserRepository {
-	return &UserRepository{
+func NewUserPersistence(db *gorm.DB) *UserPersistence {
+	return &UserPersistence{
 		dbConn: db,
 	}
 }
 
-func (repo *UserRepository) List() (*[]database.User, error) {
+func (repo *UserPersistence) List() (*[]database.User, error) {
 	users := new([]database.User)
 	if err := repo.dbConn.Find(users).Error; err != nil {
 		return users, fmt.Errorf("gateways/user.go List err: %w", err)
@@ -30,7 +30,7 @@ func (repo *UserRepository) List() (*[]database.User, error) {
 	return users, nil
 }
 
-func (repo *UserRepository) FindById(id int) (*database.User, error) {
+func (repo *UserPersistence) FindById(id int) (*database.User, error) {
 	user := new(database.User)
 	if err := repo.dbConn.First(user, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -41,7 +41,7 @@ func (repo *UserRepository) FindById(id int) (*database.User, error) {
 	return user, nil
 }
 
-func (repo *UserRepository) FindByEmail(email string) (*database.User, error) {
+func (repo *UserPersistence) FindByEmail(email string) (*database.User, error) {
 	user := new(database.User)
 	if err := repo.dbConn.First(user, "email=?", email).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -52,7 +52,7 @@ func (repo *UserRepository) FindByEmail(email string) (*database.User, error) {
 	return user, nil
 }
 
-func (repo *UserRepository) Save(userDTO *dto.User) error {
+func (repo *UserPersistence) Save(userDTO *dto.User) error {
 	user := database.ConvertToUser(userDTO)
 	if err := repo.dbConn.Create(user).Error; err != nil {
 		// https://github.com/go-gorm/gorm/issues/4135
@@ -65,7 +65,7 @@ func (repo *UserRepository) Save(userDTO *dto.User) error {
 	return nil
 }
 
-func (repo *UserRepository) Update(id int, userDTO *dto.User) error {
+func (repo *UserPersistence) Update(id int, userDTO *dto.User) error {
 	user, err := repo.FindById(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -81,7 +81,7 @@ func (repo *UserRepository) Update(id int, userDTO *dto.User) error {
 	return nil
 }
 
-func (repo *UserRepository) Delete(id int) error {
+func (repo *UserPersistence) Delete(id int) error {
 	user := new(database.User)
 	if err := repo.dbConn.Delete(user, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

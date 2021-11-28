@@ -8,8 +8,8 @@ import (
 	"github.com/fujisawaryohei/blog-server/usecases"
 	"github.com/fujisawaryohei/blog-server/web"
 	"github.com/fujisawaryohei/blog-server/web/auth"
-	"github.com/fujisawaryohei/blog-server/web/gateways"
 	"github.com/fujisawaryohei/blog-server/web/handlers"
+	"github.com/fujisawaryohei/blog-server/web/persistences"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -32,14 +32,14 @@ func main() {
 	// App Init
 	if len(commandArgs) == 0 {
 		// UserHandler Init
-		userRepository := gateways.NewUserRepository(db)
+		userPersistence := persistences.NewUserPersistence(db)
 		authenticator := auth.NewAuthenticator()
-		userUseCase := usecases.NewUserUsecase(userRepository, authenticator)
+		userUseCase := usecases.NewUserUsecase(userPersistence, authenticator)
 		userHandler := handlers.NewUserHandler(userUseCase)
 
 		// PostHandler Init
-		postRepository := gateways.NewPostRepository(db)
-		postUseCase := usecases.NewPostUsecase(postRepository)
+		postPersistence := persistences.NewPostPersistence(db)
+		postUseCase := usecases.NewPostUsecase(postPersistence)
 		postHandler := handlers.NewPostHanlder(postUseCase)
 
 		// サーバー起動

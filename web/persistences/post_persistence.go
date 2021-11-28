@@ -1,4 +1,4 @@
-package gateways
+package persistences
 
 import (
 	"errors"
@@ -11,17 +11,17 @@ import (
 )
 
 // TODO: ドメインモデルに変換して返す
-type PostRepository struct {
+type PostPersistence struct {
 	dbConn *gorm.DB
 }
 
-func NewPostRepository(db *gorm.DB) *PostRepository {
-	return &PostRepository{
+func NewPostPersistence(db *gorm.DB) *PostPersistence {
+	return &PostPersistence{
 		dbConn: db,
 	}
 }
 
-func (repo *PostRepository) List() (*[]database.Post, error) {
+func (repo *PostPersistence) List() (*[]database.Post, error) {
 	posts := new([]database.Post)
 	if err := repo.dbConn.Find(posts).Error; err != nil {
 		return posts, fmt.Errorf("gateways/post.go List err: %w", err)
@@ -29,7 +29,7 @@ func (repo *PostRepository) List() (*[]database.Post, error) {
 	return posts, nil
 }
 
-func (repo *PostRepository) FindById(id int) (*database.Post, error) {
+func (repo *PostPersistence) FindById(id int) (*database.Post, error) {
 	post := new(database.Post)
 	if err := repo.dbConn.First(post, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -40,7 +40,7 @@ func (repo *PostRepository) FindById(id int) (*database.Post, error) {
 	return post, nil
 }
 
-func (repo *PostRepository) Store(postDTO *dto.Post) error {
+func (repo *PostPersistence) Store(postDTO *dto.Post) error {
 	post := database.ConvertToPost(postDTO)
 	if err := repo.dbConn.Save(post).Error; err != nil {
 		return fmt.Errorf("gateway/post.go Save err: %w", err)
@@ -48,7 +48,7 @@ func (repo *PostRepository) Store(postDTO *dto.Post) error {
 	return nil
 }
 
-func (repo *PostRepository) Update(id int, postDTO *dto.Post) error {
+func (repo *PostPersistence) Update(id int, postDTO *dto.Post) error {
 	post, err := repo.FindById(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -64,7 +64,7 @@ func (repo *PostRepository) Update(id int, postDTO *dto.Post) error {
 	return nil
 }
 
-func (repo *PostRepository) Delete(id int) error {
+func (repo *PostPersistence) Delete(id int) error {
 	post := new(database.Post)
 	if err := repo.dbConn.Delete(post, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
