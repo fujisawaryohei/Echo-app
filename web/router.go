@@ -15,6 +15,8 @@ func NewServer(userHanlder *handlers.UserHandler, postHandler *handlers.PostHand
 	// アクセスロガー
 	e.Use(middleware.Logger())
 
+	e.Use(middleware.CORS())
+
 	signKey, err := auth.SignKey()
 	if err != nil {
 		log.Print(err)
