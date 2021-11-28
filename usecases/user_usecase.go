@@ -6,7 +6,6 @@ import (
 	"log"
 
 	"github.com/fujisawaryohei/blog-server/codes"
-	"github.com/fujisawaryohei/blog-server/database"
 	"github.com/fujisawaryohei/blog-server/domain/users"
 	"github.com/fujisawaryohei/blog-server/web/auth"
 	"github.com/fujisawaryohei/blog-server/web/dto"
@@ -25,7 +24,7 @@ func NewUserUsecase(repo users.UserRepository, authenticator auth.IAuthenticator
 	}
 }
 
-func (u *UserUseCase) List() (*[]database.User, error) {
+func (u *UserUseCase) List() (*[]dto.User, error) {
 	users, err := u.userRepository.List()
 	if err != nil {
 		return users, fmt.Errorf("usecases/user.go list err: %w", err)
@@ -33,7 +32,7 @@ func (u *UserUseCase) List() (*[]database.User, error) {
 	return users, err
 }
 
-func (u *UserUseCase) Find(id int) (*database.User, error) {
+func (u *UserUseCase) Find(id int) (*dto.User, error) {
 	user, err := u.userRepository.FindById(id)
 	if err != nil {
 		if errors.Is(err, codes.ErrUserNotFound) {
@@ -44,7 +43,7 @@ func (u *UserUseCase) Find(id int) (*database.User, error) {
 	return user, nil
 }
 
-func (u *UserUseCase) FindByEmail(email string) (*database.User, error) {
+func (u *UserUseCase) FindByEmail(email string) (*dto.User, error) {
 	user, err := u.userRepository.FindByEmail(email)
 	if err != nil {
 		if errors.Is(err, codes.ErrUserNotFound) {
@@ -65,7 +64,7 @@ func (u *UserUseCase) Store(userDTO *dto.User) (string, []*codes.ValidationError
 		return "", validationErrors, nil
 	}
 
-	if err := u.userRepository.Save(user.ConvertToDTO()); err != nil {
+	if err := u.userRepository.Save(user.ConvertToUserDTO()); err != nil {
 		if errors.Is(err, codes.ErrUserEmailAlreadyExisted) {
 			return "", nil, codes.ErrUserEmailAlreadyExisted
 		}
@@ -108,7 +107,7 @@ func (u *UserUseCase) Update(id int, userDTO *dto.User) ([]*codes.ValidationErro
 		return validationErrors, nil
 	}
 
-	if err := u.userRepository.Update(id, user.ConvertToDTO()); err != nil {
+	if err := u.userRepository.Update(id, user.ConvertToUserDTO()); err != nil {
 		if errors.Is(err, codes.ErrUserNotFound) {
 			return nil, codes.ErrUserNotFound
 		}

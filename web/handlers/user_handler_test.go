@@ -9,16 +9,16 @@ import (
 	"time"
 
 	"github.com/fujisawaryohei/blog-server/codes"
-	"github.com/fujisawaryohei/blog-server/database"
 	mock_repositories "github.com/fujisawaryohei/blog-server/domain/users"
 	"github.com/fujisawaryohei/blog-server/usecases"
 	"github.com/fujisawaryohei/blog-server/web/auth"
+	"github.com/fujisawaryohei/blog-server/web/dto"
 	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo"
 )
 
 func TestUserList(t *testing.T) {
-	storedUsers := &[]database.User{
+	storedUsers := &[]dto.User{
 		{
 			ID:                   1,
 			Name:                 "test",
@@ -42,7 +42,7 @@ func TestUserList(t *testing.T) {
 		name              string
 		prepareListMock   func(mock *mock_repositories.MockUserRepository)
 		prepareAuthMockFn func(mock *auth.MockIAuthenticator)
-		users             *[]database.User
+		users             *[]dto.User
 		wantCode          int
 	}{
 		{
@@ -56,9 +56,9 @@ func TestUserList(t *testing.T) {
 		{
 			name: "internal server error",
 			prepareListMock: func(mock *mock_repositories.MockUserRepository) {
-				mock.EXPECT().List().Return(&[]database.User{}, errors.New("internal server error"))
+				mock.EXPECT().List().Return(&[]dto.User{}, errors.New("internal server error"))
 			},
-			users:    &[]database.User{},
+			users:    &[]dto.User{},
 			wantCode: http.StatusInternalServerError,
 		},
 	}
@@ -85,7 +85,7 @@ func TestUserList(t *testing.T) {
 }
 
 func TestFindUser(t *testing.T) {
-	storedUser := &database.User{
+	storedUser := &dto.User{
 		ID:                   1,
 		Name:                 "test",
 		Email:                "test@example.com",
@@ -97,7 +97,7 @@ func TestFindUser(t *testing.T) {
 	tests := []struct {
 		name            string
 		prepareFindMock func(mock *mock_repositories.MockUserRepository)
-		user            *database.User
+		user            *dto.User
 		wantCode        int
 	}{
 		{
@@ -111,17 +111,17 @@ func TestFindUser(t *testing.T) {
 		{
 			name: "not found error",
 			prepareFindMock: func(mock *mock_repositories.MockUserRepository) {
-				mock.EXPECT().FindById(gomock.Any()).Return(&database.User{}, codes.ErrUserNotFound)
+				mock.EXPECT().FindById(gomock.Any()).Return(&dto.User{}, codes.ErrUserNotFound)
 			},
-			user:     &database.User{},
+			user:     &dto.User{},
 			wantCode: http.StatusNotFound,
 		},
 		{
 			name: "internal server error",
 			prepareFindMock: func(mock *mock_repositories.MockUserRepository) {
-				mock.EXPECT().FindById(gomock.Any()).Return(&database.User{}, errors.New("internal server error"))
+				mock.EXPECT().FindById(gomock.Any()).Return(&dto.User{}, errors.New("internal server error"))
 			},
-			user:     &database.User{},
+			user:     &dto.User{},
 			wantCode: http.StatusInternalServerError,
 		},
 	}
@@ -148,7 +148,7 @@ func TestFindUser(t *testing.T) {
 }
 
 func TestStoreUser(t *testing.T) {
-	storedUser := &database.User{
+	storedUser := &dto.User{
 		ID:                   1,
 		Name:                 "test",
 		Email:                "test@example.com",
@@ -240,7 +240,7 @@ func TestStoreUser(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	storedUser := &database.User{
+	storedUser := &dto.User{
 		ID:                   1,
 		Name:                 "test",
 		Email:                "test@example.com",

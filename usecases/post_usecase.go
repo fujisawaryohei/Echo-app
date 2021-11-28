@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/fujisawaryohei/blog-server/codes"
-	"github.com/fujisawaryohei/blog-server/database"
 	"github.com/fujisawaryohei/blog-server/domain/posts"
 	"github.com/fujisawaryohei/blog-server/web/dto"
 )
@@ -20,7 +19,7 @@ func NewPostUsecase(repo posts.PostRepository) *PostUsecase {
 	}
 }
 
-func (u *PostUsecase) List() (*[]database.Post, error) {
+func (u *PostUsecase) List() (*[]dto.Post, error) {
 	posts, err := u.postRepository.List()
 	if err != nil {
 		return posts, fmt.Errorf("usecases/post.go list err: %w", err)
@@ -28,7 +27,7 @@ func (u *PostUsecase) List() (*[]database.Post, error) {
 	return posts, err
 }
 
-func (u *PostUsecase) Find(id int) (*database.Post, error) {
+func (u *PostUsecase) Find(id int) (*dto.Post, error) {
 	post, err := u.postRepository.FindById(id)
 	if err != nil {
 		if errors.Is(err, codes.ErrPostNotFound) {

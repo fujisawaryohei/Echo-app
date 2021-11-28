@@ -5,12 +5,10 @@ import (
 	"fmt"
 
 	"github.com/fujisawaryohei/blog-server/codes"
-	"github.com/fujisawaryohei/blog-server/database"
 	"github.com/fujisawaryohei/blog-server/web/dto"
 	"gorm.io/gorm"
 )
 
-// TODO: ドメインモデルに変換して返す
 type PostPersistence struct {
 	dbConn *gorm.DB
 }
@@ -21,16 +19,16 @@ func NewPostPersistence(db *gorm.DB) *PostPersistence {
 	}
 }
 
-func (repo *PostPersistence) List() (*[]database.Post, error) {
-	posts := new([]database.Post)
+func (repo *PostPersistence) List() (*[]dto.Post, error) {
+	posts := new([]dto.Post)
 	if err := repo.dbConn.Find(posts).Error; err != nil {
 		return posts, fmt.Errorf("gateways/post.go List err: %w", err)
 	}
 	return posts, nil
 }
 
-func (repo *PostPersistence) FindById(id int) (*database.Post, error) {
-	post := new(database.Post)
+func (repo *PostPersistence) FindById(id int) (*dto.Post, error) {
+	post := new(dto.Post)
 	if err := repo.dbConn.First(post, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return post, codes.ErrPostNotFound
@@ -41,8 +39,7 @@ func (repo *PostPersistence) FindById(id int) (*database.Post, error) {
 }
 
 func (repo *PostPersistence) Store(postDTO *dto.Post) error {
-	post := database.ConvertToPost(postDTO)
-	if err := repo.dbConn.Save(post).Error; err != nil {
+	if err := repo.dbConn.Save(postDTO).Error; err != nil {
 		return fmt.Errorf("gateway/post.go Save err: %w", err)
 	}
 	return nil
@@ -57,15 +54,14 @@ func (repo *PostPersistence) Update(id int, postDTO *dto.Post) error {
 		return fmt.Errorf("gateay/post.go Update err: %w", err)
 	}
 
-	newPost := database.ConvertToPost(postDTO)
-	if err := repo.dbConn.Model(post).Updates(newPost).Error; err != nil {
+	if err := repo.dbConn.Model(post).Updates(postDTO).Error; err != nil {
 		return fmt.Errorf("gateway/post.go Update err: %w", err)
 	}
 	return nil
 }
 
 func (repo *PostPersistence) Delete(id int) error {
-	post := new(database.Post)
+	post := new(dto.Post)
 	if err := repo.dbConn.Delete(post, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return codes.ErrPostNotFound

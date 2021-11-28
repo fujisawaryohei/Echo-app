@@ -3,11 +3,11 @@ package presenters
 import (
 	"time"
 
-	"github.com/fujisawaryohei/blog-server/database"
 	viewmodel "github.com/fujisawaryohei/blog-server/presenters/viewModel"
+	"github.com/fujisawaryohei/blog-server/web/dto"
 )
 
-func CreateUserViewModel(user *database.User) viewmodel.User {
+func CreateUserViewModel(user *dto.User) viewmodel.User {
 	return viewmodel.User{
 		Id:        user.ID,
 		Name:      user.Name,
@@ -17,7 +17,7 @@ func CreateUserViewModel(user *database.User) viewmodel.User {
 	}
 }
 
-func CreateUsersViewModel(users *[]database.User) []viewmodel.User {
+func CreateUsersViewModel(users *[]dto.User) []viewmodel.User {
 	var userViewModels []viewmodel.User
 	for _, user := range *users {
 		userViewModels = append(userViewModels, viewmodel.User{

@@ -57,7 +57,7 @@ func (u *User) ValidationErrors() []*codes.ValidationError {
 	return validationErrors
 }
 
-func (u *User) ConvertToDTO() *dto.User {
+func (u *User) ConvertToUserDTO() *dto.User {
 	return &dto.User{
 		Name:                 u.Name,
 		Email:                u.Email.Address,
