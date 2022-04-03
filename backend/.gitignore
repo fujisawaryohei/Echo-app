@@ -1,1 +1,8 @@
+# Secret.key
 /secret.key
+
+# Docker Volumes
+/server
+
+# env
+/.env

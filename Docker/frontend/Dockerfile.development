@@ -1,0 +1,16 @@
+FROM node:14.17.4
+
+RUN mkdir /frontend
+WORKDIR /frontend
+
+# COPY package*.json ./../../frontend
+# RUN npm install
+COPY ./frontend/package.json /frontend/
+COPY ./frontend/package-lock.json /frontend/
+RUN npm install
+
+# COPY ./../../frontend /frontend
+COPY ./frontend /frontend
+
+
+EXPOSE 3000
