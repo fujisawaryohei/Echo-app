@@ -1,0 +1,45 @@
+openapi: "3.0.3"
+
+info:
+  title: "Tag Schema"
+  description: |
+    - Tag Schema
+  version: "1.0.0"
+
+paths: {}
+
+components:
+  schemas:
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        post_id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string 
+          format: date-time
+
+    Tags:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+          name:
+            type: string
+          post_id:
+            type: integer
+          created_at:
+            type: string
+            format: date-time
+          updated_at:
+            type: string 
+            format: date-time

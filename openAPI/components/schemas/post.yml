@@ -1,0 +1,49 @@
+openapi: "3.0.3"
+
+info:
+  title: "Post Schema"
+  description: |
+    - Post Schema
+  version: "1.0.0"
+
+paths: {}
+
+components:
+  schemas:
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        content:
+          type: string
+        published_at:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string 
+          format: date-time
+
+    Posts:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+          title:
+            type: string
+          content:
+            type: string
+          published_at:
+            type: boolean
+          created_at:
+            type: string
+            format: date-time
+          updated_at:
+            type: string 
+            format: date-time
