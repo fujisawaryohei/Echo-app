@@ -29,18 +29,24 @@ jobs:
   build:
     needs: setup
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v2
       - name: build
-        run: go build ./backend/...
+        run: go build ./...
 
-  test:
+  backend-test:
     needs: setup
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v2
       - name: test
-        run: go test ./backend/... -v
+        run: go test ./... -v
 
   staticcheck:
     name: runner / staticcheck
