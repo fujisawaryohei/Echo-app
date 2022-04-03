@@ -32,7 +32,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: build
-        run: go build ./...
+        run: go build ./backend/...
 
   test:
     needs: setup
@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: test
-        run: go test ./... -v
+        run: go test ./backend/... -v
 
   staticcheck:
     name: runner / staticcheck
