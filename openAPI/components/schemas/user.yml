@@ -1,0 +1,49 @@
+openapi: "3.0.3"
+
+info:
+  title: "User Schema"
+  description: |
+    - User Schema
+  version: "1.0.0"
+
+paths: {}
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        password_confirmation:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string 
+          format: date-time
+
+    Users:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+          name:
+            type: string
+          email:
+            type: string
+          created_at:
+            type: string
+            format: date-time
+          updated_at:
+            type: string 
+            format: date-time

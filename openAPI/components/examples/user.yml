@@ -1,0 +1,36 @@
+openapi: "3.0.3"
+
+info:
+  title: "User Example"
+  description: |
+    - User Example
+  version: "1.0.0"
+
+paths: {}
+
+components:
+  examples:
+    User:
+      summary: 'ユーザー'
+      value:
+        id: 1
+        name: 'user1'
+        email: 'user@example.com'
+        password: 'password'
+        password_confirmation: 'password'
+        created_at: '2021-08-25T05:18:29.546Z'
+        updated_at: '2021-08-25T05:18:29.546Z'
+
+    Users:
+      summary: 'ユーザー一覧'
+      value:
+        - id: 2
+          name: 'user1'
+          email: 'user1@example.com'
+          created_at: '2021-08-25T05:18:29.546Z'
+          updated_at: '2021-08-25T05:18:29.546Z'
+        - id: 1
+          name: 'user2'
+          email: 'user2@example.com'
+          created_at: '2021-08-25T05:18:29.546Z'
+          updated_at: '2021-08-25T05:18:29.546Z'

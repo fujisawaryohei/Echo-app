@@ -1,0 +1,37 @@
+openapi: "3.0.3"
+
+info:
+  title: "Blog Example"
+  description: |
+    - Blog Example
+  version: "1.0.0"
+
+paths: {}
+
+components:
+  examples:
+    Post:
+      summary: 'ブログ'
+      value:
+        id: 1
+        title: 'OpenAPI + Prismでmock server建てた話'
+        content: '本日はOpenAPIとPrismを使用したMock Serverの建て方について話して行こうと思います。'
+        published: true
+        created_at: '2021-08-25T05:18:29.546Z'
+        updated_at: '2021-08-25T05:18:29.546Z'
+
+    Posts:
+      summary: 'ブログ一覧'
+      value:
+        - id: 1
+          title: 'OpenAPI + Prismでmock server建てた話'
+          content: '本日はOpenAPIとPrismを使用したMock Serverの建て方について話して行こうと思います。'
+          published: true
+          created_at: '2021-08-25T05:18:29.546Z'
+          updated_at: '2021-08-25T05:18:29.546Z'
+        - id: 2
+          title: 'NextJS+TypeScriptでブログを作ったよ〜'
+          content: '本日はNextJS + TypeScriptで作成したブログシステムについてのアウトプットです。'
+          published: true
+          created_at: '2021-08-25T05:18:29.546Z'
+          updated_at: '2021-08-25T05:18:29.546Z'
