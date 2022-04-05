@@ -1,3 +1,6 @@
 development:
     driver: postgres
     open: user=fujisawaryohei dbname=blog_server sslmode=disable
+docker:
+    driver: postgres
+    open: host=db user=postgres password=password dbname=blog_server sslmode=disable

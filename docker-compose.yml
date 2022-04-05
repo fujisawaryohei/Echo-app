@@ -15,7 +15,7 @@ services:
     container_name: blog-server
     image: kawada-tech-blog-server-dev
     build:
-      dockerfile: Docker/backend/Dockerfile.development
+      dockerfile: backend/Dockerfile.development
       context: .
     tty: true
     stdin_open: true
@@ -31,7 +31,7 @@ services:
     container_name: blog-front
     image: kawada-tech-blog-front-dev
     build:
-      dockerfile: Docker/frontend/Dockerfile.development
+      dockerfile: frontend/Dockerfile.development
       context: .
     tty: true
     stdin_open: true
@@ -49,12 +49,13 @@ services:
     image: minio/minio:latest
     ports:
       - 9000:9000
-    command: [server, /data]
+      - 9001:9001
+    command: ['server', '/data', '--console-address', ':9001']
     volumes:
       - ./backend/server/minio/data:/data:delegated
     environment:
-      MINIO_ACCESS_KEY: access_key
-      MINIO_SECRET_KEY: access_secret
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: password
     restart: always
     depends_on:
       - db

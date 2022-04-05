@@ -1,0 +1,13 @@
+FROM golang:1.16
+
+RUN mkdir /backend
+WORKDIR /backend
+
+COPY /backend/go.mod /backend/go.mod
+COPY /backend/go.sum /backend/go.sum
+RUN go install bitbucket.org/liamstask/goose/cmd/goose@latest
+RUN go mod download
+
+COPY . /backend
+
+EXPOSE 8080
