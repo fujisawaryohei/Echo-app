@@ -9,7 +9,7 @@ info:
   version: "1.0.0"
 
 servers:
-  - url: "http://localhost:8080"
+  - url: "http://localhost:8000"
     description: "ローカル環境"
 # - url: ""
 #   description: "本番環境"
@@ -245,10 +245,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./components/schemas/admin.yml#/components/schemas/Post"
+                $ref: "./components/schemas/post.yml#/components/schemas/Post"
               examples:
                 Post:
-                  $ref: "./components/examples/admin.yml#/components/examples/Post"
+                  $ref: "./components/examples/post.yml#/components/examples/Post"
         "401":
           $ref: "./components/responses/error.yml#/components/responses/401-Unauthenticated"
         "404":

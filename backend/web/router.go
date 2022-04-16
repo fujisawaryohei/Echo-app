@@ -45,5 +45,5 @@ func NewServer(userHanlder *handlers.UserHandler, postHandler *handlers.PostHand
 	e.GET("/posts/:id", postHandler.Find)
 
 	// サーバー起動
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(":8000"))
 }

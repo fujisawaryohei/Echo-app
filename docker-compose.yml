@@ -1,19 +1,19 @@
 version: '3'
 services:
   db:
-    container_name: blog-db
     image: postgres
+    container_name: blog-db
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: postgres
     volumes:
       - ./backend/server/postgres/data:/var/lib/postgresql/data
     ports:
-      - 3306:3306
+      - 5432:5432
 
   backend:
-    container_name: blog-server
     image: kawada-tech-blog-server-dev
+    container_name: blog-server
     build:
       dockerfile: backend/Dockerfile.development
       context: .
@@ -25,11 +25,11 @@ services:
     depends_on:
       - db
     ports:
-      - 8080:8080
+      - 8000:8000
     
   frontend:
-    container_name: blog-front
     image: kawada-tech-blog-front-dev
+    container_name: blog-front
     build:
       dockerfile: frontend/Dockerfile.development
       context: .
@@ -42,8 +42,8 @@ services:
     ports:
       - 3000:3000
     depends_on:
-      - backend
       - db
+      - backend
 
   minio:
     image: minio/minio:latest
@@ -61,3 +61,33 @@ services:
       - db
       - backend
       - frontend
+  
+  swagger-ui:
+      image: swaggerapi/swagger-ui
+      container_name: kawada-tech-blog-swagger-ui
+      ports:
+        - "80:8080"
+      volumes:
+        - ./openAPI:/usr/share/nginx/html/openAPI
+      environment:
+        API_URL: openAPI/main.yml
+      depends_on:
+        - db
+        - backend
+        - frontend
+        - minio
+
+  swagger-api:
+    image: stoplight/prism:latest
+    container_name: kawada-tech-blog-swagger-api
+    ports:
+      - "4010:4010"
+    command: mock -h 0.0.0.0 /openAPI/main.yml
+    volumes:
+      - ./openAPI:/openAPI
+    depends_on:
+      - db
+      - backend
+      - frontend
+      - minio
+      - swagger-ui
