@@ -15,7 +15,7 @@ components:
       value:
         id: 1
         name: Swagger
-        post_id: 1
+        thumbnail_url: https://www.pinterest.jp/pin/55521007893164247/
         created_at: '2021-08-25T05:18:29.546Z'
         updated_at: '2021-08-25T05:18:29.546Z'
 
@@ -24,11 +24,11 @@ components:
       value:
         - id: 1
           name: Swagger
-          post_id: 1
+          thumbnail_url: https://www.pinterest.jp/pin/55521007893164247/
           created_at: '2021-08-25T05:18:29.546Z'
           updated_at: '2021-08-25T05:18:29.546Z'
         - id: 2
           name: NextJS
-          post_id: 1
+          thumbnail_url: https://www.pinterest.jp/pin/55521007893164247/
           created_at: '2021-08-25T05:18:29.546Z'
           updated_at: '2021-08-25T05:18:29.546Z'

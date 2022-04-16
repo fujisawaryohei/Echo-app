@@ -15,12 +15,10 @@ servers:
 #   description: "本番環境"
 
 tags:
-  - name: users
-    description: "Userリソース操作"
-  - name: posts
-    description: "Postリソース操作"
-  - name: tags
-    description: "Tagリソース操作"
+  - name: admin
+    description: "Admin機能"
+  - name: public
+    description: "公開側機能"
 
 # JWT認証
 components:
@@ -32,60 +30,26 @@ components:
       description: Credentials or access token for API
 
 paths:
-  "/signup":
-    post:
-      summary: "ユーザー情報を登録する"
-      tags: ["users"]
-      deprecated: false
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "./components/schemas/user.yml#/components/schemas/User"
-            examples:
-              Post:
-                $ref: "./components/examples/user.yml#/components/examples/User"
-      responses:
-        "400":
-          $ref: "./components/responses/error.yml#/components/responses/400-BadRequest"
 
   "/login":
     post:
       summary: "ログインする"
-      tags: ["users"]
+      tags: ["admin"]
       deprecated: false
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "./components/schemas/user.yml#/components/schemas/User"
+              $ref: "./components/schemas/admin.yml#/components/schemas/Admin"
             examples:
               Post:
-                $ref: "./components/examples/user.yml#/components/examples/User"
+                $ref: "./components/examples/admin.yml#/components/examples/Admin"
       responses:
         "400":
           $ref: "./components/responses/error.yml#/components/responses/400-BadRequest"
 
-  "/users":
-    get:
-      summary: "ユーザー一覧を取得する"
-      tags: ["users"]
-      deprecated: false
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "./components/schemas/user.yml#/components/schemas/Users"
-              examples:
-                Posts:
-                  $ref: "./components/examples/user.yml#/components/examples/Users"
-        "401":
-          $ref: "./components/responses/error.yml#/components/responses/401-Unauthenticated"
-
-  "/users/{userID}":
+  "/admin/{userID}":
     parameters:
       - name: userID
         in: path
@@ -95,17 +59,17 @@ paths:
 
     get:
       summary: "ユーザー詳細を返す"
-      tags: ["users"]
+      tags: ["admin"]
       deprecated: false
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "./components/schemas/user.yml#/components/schemas/User"
+                $ref: "./components/schemas/admin.yml#/components/schemas/Admin"
               examples:
                 Post:
-                  $ref: "./components/examples/user.yml#/components/examples/User"
+                  $ref: "./components/examples/admin.yml#/components/examples/Admin"
         "401":
           $ref: "./components/responses/error.yml#/components/responses/401-Unauthenticated"
         "404":
@@ -113,7 +77,7 @@ paths:
 
     patch:
       summary: "ユーザーを更新する"
-      tags: ["users"]
+      tags: ["admin"]
       deprecated: false
       responses:
         "401":
@@ -125,24 +89,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./components/schemas/user.yml#/components/schemas/User"
+              $ref: "./components/schemas/admin.yml#/components/schemas/Admin"
             examples:
               Post:
-                $ref: "./components/examples/user.yml#/components/examples/User"
+                $ref: "./components/examples/admin.yml#/components/examples/Admin"
 
-    delete:
-      summary: "ユーザーを削除する"
-      tags: ["users"]
-      responses:
-        "401":
-          $ref: "./components/responses/error.yml#/components/responses/401-Unauthenticated"
-        "404":
-          $ref: "./components/responses/error.yml#/components/responses/404-NotFound"
-
-  "/posts":
+  "/admin/posts":
     get:
       summary: "ブログ一覧を返す"
-      tags: ["posts"]
+      tags: ["admin"]
       deprecated: false
       responses:
         "200":
@@ -158,7 +113,7 @@ paths:
 
     post:
       summary: "ブログを登録する"
-      tags: ["posts"]
+      tags: ["admin"]
       deprecated: false
       requestBody:
         required: true
@@ -175,7 +130,7 @@ paths:
         "401":
           $ref: "./components/responses/error.yml#/components/responses/401-Unauthenticated"
 
-  "/posts/{postID}":
+  "/admin/posts/{postID}":
     parameters:
       - name: postID
         in: path
@@ -185,7 +140,7 @@ paths:
 
     get:
       summary: "ブログ詳細を返す"
-      tags: ["posts"]
+      tags: ["admin"]
       deprecated: false
       responses:
         "200":
@@ -203,7 +158,7 @@ paths:
     
     patch:
       summary: "ブログを更新する"
-      tags: ["posts"]
+      tags: ["admin"]
       deprecated: false
       responses:
         "401":
@@ -222,22 +177,88 @@ paths:
 
     delete:
       summary: "ブログを削除する"
-      tags: ["posts"]
+      tags: ["admin"]
       responses:
         "401":
           $ref: "./components/responses/error.yml#/components/responses/401-Unauthenticated"
         "404":
           $ref: "./components/responses/error.yml#/components/responses/404-NotFound"
+  
+  "/admin/tags":
+    post:
+      summary: "タグを作成する"
+      tags: ["admin"]
+      deprecated: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "./components/schemas/tag.yml#/components/schemas/Tag"
+            examples:
+              Post:
+                $ref: "./components/examples/tag.yml#/components/examples/Tag"
+      responses:
+        "400":
+          $ref: "./components/responses/error.yml#/components/responses/400-BadRequest"
+        "401":
+          $ref: "./components/responses/error.yml#/components/responses/401-Unauthenticated"
 
-  "/tags":
+  "/posts":
     get:
-      summary: "タグ一覧を返す"
-      tags: ["tags"]
+      summary: "ブログ一覧を返す"
+      tags: ["public"]
       deprecated: false
       parameters:
         - in: query
+          name: title
+          required: false
+        - in: query
           name: tag_name
           required: false
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "./components/schemas/post.yml#/components/schemas/Posts"
+              examples:
+                Posts:
+                  $ref: "./components/examples/post.yml#/components/examples/Posts"
+        "401":
+          $ref: "./components/responses/error.yml#/components/responses/401-Unauthenticated"
+
+  "/posts/{postID}":
+    parameters:
+      - name: postID
+        in: path
+        required: true
+        schema: { type: integer }
+        example: 1
+
+    get:
+      summary: "ブログ詳細を返す"
+      tags: ["public"]
+      deprecated: false
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "./components/schemas/admin.yml#/components/schemas/Post"
+              examples:
+                Post:
+                  $ref: "./components/examples/admin.yml#/components/examples/Post"
+        "401":
+          $ref: "./components/responses/error.yml#/components/responses/401-Unauthenticated"
+        "404":
+          $ref: "./components/responses/error.yml#/components/responses/404-NotFound"
+  
+  "/tags":
+    get:
+      summary: "タグ一覧を返す"
+      tags: ["public"]
+      deprecated: false
       responses:
         "200":
           content:

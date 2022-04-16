@@ -17,6 +17,7 @@ components:
         title: 'OpenAPI + Prismでmock server建てた話'
         content: '本日はOpenAPIとPrismを使用したMock Serverの建て方について話して行こうと思います。'
         published: true
+        thumbnail_url: https://www.pinterest.jp/pin/55521007893164247/
         created_at: '2021-08-25T05:18:29.546Z'
         updated_at: '2021-08-25T05:18:29.546Z'
 
@@ -27,11 +28,13 @@ components:
           title: 'OpenAPI + Prismでmock server建てた話'
           content: '本日はOpenAPIとPrismを使用したMock Serverの建て方について話して行こうと思います。'
           published: true
+          thumbnail_url: https://www.pinterest.jp/pin/55521007893164247/
           created_at: '2021-08-25T05:18:29.546Z'
           updated_at: '2021-08-25T05:18:29.546Z'
         - id: 2
           title: 'NextJS+TypeScriptでブログを作ったよ〜'
           content: '本日はNextJS + TypeScriptで作成したブログシステムについてのアウトプットです。'
           published: true
+          thumbnail_url: https://www.pinterest.jp/pin/55521007893164247/
           created_at: '2021-08-25T05:18:29.546Z'
           updated_at: '2021-08-25T05:18:29.546Z'

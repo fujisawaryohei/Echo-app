@@ -21,6 +21,8 @@ components:
           type: string
         published_at:
           type: boolean
+        thumbnail_url:
+          type: string
         created_at:
           type: string
           format: date-time
@@ -41,6 +43,8 @@ components:
             type: string
           published_at:
             type: boolean
+          thumbnail_url:
+            type: string
           created_at:
             type: string
             format: date-time

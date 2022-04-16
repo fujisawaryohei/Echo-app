@@ -1,16 +1,16 @@
 openapi: "3.0.3"
 
 info:
-  title: "User Schema"
+  title: "Admin Schema"
   description: |
-    - User Schema
+    - Admin Schema
   version: "1.0.0"
 
 paths: {}
 
 components:
   schemas:
-    User:
+    Admin:
       type: object
       properties:
         id:
@@ -30,7 +30,7 @@ components:
           type: string 
           format: date-time
 
-    Users:
+    AdminIndex:
       type: array
       items:
         type: object

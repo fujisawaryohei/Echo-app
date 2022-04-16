@@ -17,7 +17,7 @@ components:
           type: integer
         name:
           type: string
-        post_id:
+        thumbnail_url:
           type: integer
         created_at:
           type: string
@@ -35,7 +35,7 @@ components:
             type: integer
           name:
             type: string
-          post_id:
+          thumbnail_url:
             type: integer
           created_at:
             type: string

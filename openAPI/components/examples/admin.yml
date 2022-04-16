@@ -1,36 +1,36 @@
 openapi: "3.0.3"
 
 info:
-  title: "User Example"
+  title: "Admin Example"
   description: |
-    - User Example
+    - Admin Example
   version: "1.0.0"
 
 paths: {}
 
 components:
   examples:
-    User:
-      summary: 'ユーザー'
+    Admin:
+      summary: 'Admin'
       value:
         id: 1
-        name: 'user1'
-        email: 'user@example.com'
+        name: 'admin1'
+        email: 'admin@example.com'
         password: 'password'
         password_confirmation: 'password'
         created_at: '2021-08-25T05:18:29.546Z'
         updated_at: '2021-08-25T05:18:29.546Z'
 
-    Users:
-      summary: 'ユーザー一覧'
+    AdminIndex:
+      summary: 'Admin一覧'
       value:
         - id: 2
-          name: 'user1'
-          email: 'user1@example.com'
+          name: 'admin1'
+          email: 'admin1@example.com'
           created_at: '2021-08-25T05:18:29.546Z'
           updated_at: '2021-08-25T05:18:29.546Z'
         - id: 1
-          name: 'user2'
-          email: 'user2@example.com'
+          name: 'admin2'
+          email: 'admin2@example.com'
           created_at: '2021-08-25T05:18:29.546Z'
           updated_at: '2021-08-25T05:18:29.546Z'
