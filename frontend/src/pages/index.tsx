@@ -1,8 +1,7 @@
 import { useEffect } from 'react'
+import PostCard from '../components/PostCard';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { postSelector, requestGetPostsSuccess} from "../stores/post";
-import PostCard from '../components/PostCard'
-import { Grid } from '@mui/material'
 
 const Index = () => {
   const dispatch = useAppDispatch();
@@ -13,11 +12,13 @@ const Index = () => {
   }, [dispatch])
   
   return (
-    <Grid container spacing={2}>
+    <div className='flex flex-wrap justify-between'>
       {posts.map((post) => {
-        return <PostCard post={post} key={post.id.toString()} />
+        return (
+          <PostCard key={post.id} post={post} />
+        )
       })}
-    </Grid>
+    </div>
   )
 }
 export default Index;

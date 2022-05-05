@@ -3,12 +3,16 @@
 * Richard Clark (http://richclarkdesign.com)
 * http://cssreset.com
 */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 html {
     margin:0;
     padding:0;
     border:0;
     outline:0;
-    font-size:100%;
+    font-size: 16px;
     vertical-align:baseline;
     background:transparent;
     background-color: #F4F5F7;

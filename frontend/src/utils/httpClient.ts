@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from "axios"
 
 // envによってURLを変更する処理を追加
 // const BASE_URL = 'http://127.0.0.1:4010'
-const BASE_URL = 'http://localhost:8080'
+const BASE_URL = 'http://localhost:8000'
 
 export const get = async<T>(path: string, token?: string): Promise<T> => {
   return await axios.get<T>(BASE_URL + path, Headers(token)).then((response: AxiosResponse<T>) => {

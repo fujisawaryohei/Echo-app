@@ -1,5 +1,4 @@
-import { Post } from '../types'
-import { Grid, Card, CardMedia, CardContent, Typography, CardActions, Button } from '@mui/material'
+import { Post } from '../types/index'
 
 type IProps = {
   post: Post
@@ -7,27 +6,10 @@ type IProps = {
 
 const PostCard = (props: IProps) => {
   return (
-    <Grid item xs={4}>
-      <Card>
-        <CardMedia
-          component="img"
-          alt="post-card"
-          height="300"
-          image="/blog-image.jpeg"
-        />
-        <CardContent sx={ { backgroundColor: '#FFFFFF' } } >
-          <Typography gutterBottom variant="h6" component="div">
-            { props.post.title }
-          </Typography>
-        </CardContent>
-        <Typography noWrap={ true } sx={ { marginLeft: '15px' } }>
-          { props.post.body }
-        </Typography>
-        <CardActions>
-          <Button size="small">詳細ページへ</Button>
-        </CardActions>
-      </Card>
-    </Grid>
+    <div key={props.post.id} className="h-1/5 w-1/3 m-1">
+      <img className='h-40 w-full' src="/blog-image.jpeg"></img>
+      <p>{props.post.title}</p>
+    </div>
   )
 }
 
